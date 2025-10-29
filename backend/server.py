@@ -51,7 +51,18 @@ class User(BaseModel):
     points: int = 0
     level: str = "Beginner"
     completed_challenges: List[str] = []
+    streak_days: int = 0
+    last_active_date: Optional[str] = None
+    daily_challenge_completed: bool = False
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class ForgotPasswordRequest(BaseModel):
+    email: EmailStr
+
+class ResetPasswordRequest(BaseModel):
+    email: EmailStr
+    reset_code: str
+    new_password: str
 
 class QuestionItem(BaseModel):
     question: str
