@@ -87,6 +87,8 @@ function App() {
             <Route path="/courses" element={user ? <Courses /> : <Navigate to="/" />} />
             <Route path="/courses/:id" element={user ? <CourseViewer /> : <Navigate to="/" />} />
             <Route path="/quiz" element={user ? <QuizMode /> : <Navigate to="/" />} />
+            <Route path="/profile" element={user ? <Profile /> : <Navigate to="/" />} />
+
             <Route path="/spot-the-phishing" element={user ? <SpotThePhishing /> : <Navigate to="/" />} />
 
             <Route path="/leaderboard" element={user ? <Leaderboard /> : <Navigate to="/" />} />
