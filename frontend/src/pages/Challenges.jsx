@@ -51,6 +51,63 @@ const Challenges = () => {
     setFilteredChallenges(filtered);
   };
 
+  const groupByCialdini = () => {
+    const grouped = {
+      reciprocity: [],
+      commitment: [],
+      social_proof: [],
+      authority: [],
+      liking: [],
+      scarcity: []
+    };
+    
+    challenges.forEach(challenge => {
+      const principle = challenge.cialdini_principle;
+      if (grouped[principle]) {
+        grouped[principle].push(challenge);
+      }
+    });
+    
+    return grouped;
+  };
+
+  const getCialdiniIcon = (principle) => {
+    const icons = {
+      reciprocity: <Gift className="w-5 h-5" />,
+      commitment: <Handshake className="w-5 h-5" />,
+      social_proof: <Users className="w-5 h-5" />,
+      authority: <Crown className="w-5 h-5" />,
+      liking: <Heart className="w-5 h-5" />,
+      scarcity: <Zap className="w-5 h-5" />
+    };
+    return icons[principle] || <Star className="w-5 h-5" />;
+  };
+
+  const getCialdiniLabel = (principle) => {
+    const labels = {
+      reciprocity: "Reciprocity (Timbal Balik)",
+      commitment: "Commitment & Consistency (Komitmen)",
+      social_proof: "Social Proof (Bukti Sosial)",
+      authority: "Authority (Otoritas)",
+      liking: "Liking (Kesukaan)",
+      scarcity: "Scarcity (Kelangkaan)"
+    };
+    return labels[principle] || principle;
+  };
+
+  const getCialdiniDescription = (principle) => {
+    const descriptions = {
+      reciprocity: "Orang merasa wajib membalas kebaikan yang diterima",
+      commitment: "Orang cenderung konsisten dengan komitmen awal mereka",
+      social_proof: "Orang mengikuti tindakan orang lain",
+      authority: "Orang cenderung patuh pada figur otoritas",
+      liking: "Orang lebih mudah dipengaruhi oleh orang yang mereka sukai",
+      scarcity: "Orang menghargai hal yang langka atau terbatas"
+    };
+    return descriptions[principle] || "";
+  };
+
+
   const getCategoryIcon = (category) => {
     const icons = {
       phishing: <Shield className="w-5 h-5" />,
