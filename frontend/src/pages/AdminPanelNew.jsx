@@ -450,6 +450,360 @@ const AdminPanelNew = () => {
 };
 
 // Challenge Form Component
+
+// Course Form Component
+const CourseForm = ({ token, courseData, onSuccess }) => {
+  const [formData, setFormData] = useState(courseData || {
+    title: '',
+    description: '',
+    category: 'social_engineering',
+    difficulty: 'beginner',
+    modules: [],
+    total_duration_minutes: 0,
+    prerequisites: [],
+    learning_outcomes: [],
+    created_by: ''
+  });
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    try {
+      if (courseData) {
+        await axios.put(`${API}/admin/courses/${courseData.id}`, formData, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        toast.success('Course berhasil diupdate');
+      } else {
+        await axios.post(`${API}/admin/courses`, formData, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        toast.success('Course berhasil dibuat');
+      }
+      onSuccess();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Gagal menyimpan course');
+    }
+  };
+
+  const addModule = () => {
+    setFormData({
+      ...formData,
+      modules: [
+        ...formData.modules,
+        {
+          module_number: formData.modules.length + 1,
+          title: '',
+          description: '',
+          slides: []
+        }
+      ]
+    });
+  };
+
+  const updateModule = (index, field, value) => {
+    const newModules = [...formData.modules];
+    newModules[index][field] = value;
+    setFormData({ ...formData, modules: newModules });
+  };
+
+  const removeModule = (index) => {
+    const newModules = formData.modules.filter((_, i) => i !== index);
+    // Renumber modules
+    newModules.forEach((mod, idx) => {
+      mod.module_number = idx + 1;
+    });
+    setFormData({ ...formData, modules: newModules });
+  };
+
+  const addSlide = (moduleIndex) => {
+    const newModules = [...formData.modules];
+    newModules[moduleIndex].slides = [
+      ...(newModules[moduleIndex].slides || []),
+      {
+        title: '',
+        content: '',
+        code_example: '',
+        image_url: ''
+      }
+    ];
+    setFormData({ ...formData, modules: newModules });
+  };
+
+  const updateSlide = (moduleIndex, slideIndex, field, value) => {
+    const newModules = [...formData.modules];
+    newModules[moduleIndex].slides[slideIndex][field] = value;
+    setFormData({ ...formData, modules: newModules });
+  };
+
+  const removeSlide = (moduleIndex, slideIndex) => {
+    const newModules = [...formData.modules];
+    newModules[moduleIndex].slides = newModules[moduleIndex].slides.filter((_, i) => i !== slideIndex);
+    setFormData({ ...formData, modules: newModules });
+  };
+
+  const addPrerequisite = () => {
+    setFormData({
+      ...formData,
+      prerequisites: [...formData.prerequisites, '']
+    });
+  };
+
+  const updatePrerequisite = (index, value) => {
+    const newPrereqs = [...formData.prerequisites];
+    newPrereqs[index] = value;
+    setFormData({ ...formData, prerequisites: newPrereqs });
+  };
+
+  const removePrerequisite = (index) => {
+    setFormData({
+      ...formData,
+      prerequisites: formData.prerequisites.filter((_, i) => i !== index)
+    });
+  };
+
+  const addLearningOutcome = () => {
+    setFormData({
+      ...formData,
+      learning_outcomes: [...formData.learning_outcomes, '']
+    });
+  };
+
+  const updateLearningOutcome = (index, value) => {
+    const newOutcomes = [...formData.learning_outcomes];
+    newOutcomes[index] = value;
+    setFormData({ ...formData, learning_outcomes: newOutcomes });
+  };
+
+  const removeLearningOutcome = (index) => {
+    setFormData({
+      ...formData,
+      learning_outcomes: formData.learning_outcomes.filter((_, i) => i !== index)
+    });
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className='space-y-6'>
+      {/* Basic Info */}
+      <div className='space-y-4'>
+        <div>
+          <Label>Judul Course</Label>
+          <Input
+            value={formData.title}
+            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+            className='bg-zinc-900/50 border-zinc-800 mt-2'
+            placeholder='Masukkan judul course'
+            required
+          />
+        </div>
+
+        <div>
+          <Label>Deskripsi</Label>
+          <Textarea
+            value={formData.description}
+            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+            className='bg-zinc-900/50 border-zinc-800 mt-2'
+            rows={3}
+            placeholder='Deskripsi course'
+            required
+          />
+        </div>
+
+        <div className='grid grid-cols-3 gap-4'>
+          <div>
+            <Label>Kategori</Label>
+            <Select value={formData.category} onValueChange={(v) => setFormData({ ...formData, category: v })}>
+              <SelectTrigger className='bg-zinc-900/50 border-zinc-800 mt-2'>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value='social_engineering'>Social Engineering</SelectItem>
+                <SelectItem value='phishing'>Phishing</SelectItem>
+                <SelectItem value='security'>Security Awareness</SelectItem>
+                <SelectItem value='psychology'>Psychology</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div>
+            <Label>Tingkat</Label>
+            <Select value={formData.difficulty} onValueChange={(v) => setFormData({ ...formData, difficulty: v })}>
+              <SelectTrigger className='bg-zinc-900/50 border-zinc-800 mt-2'>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value='beginner'>Beginner</SelectItem>
+                <SelectItem value='intermediate'>Intermediate</SelectItem>
+                <SelectItem value='advanced'>Advanced</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div>
+            <Label>Durasi Total (menit)</Label>
+            <Input
+              type='number'
+              value={formData.total_duration_minutes}
+              onChange={(e) => setFormData({ ...formData, total_duration_minutes: parseInt(e.target.value) || 0 })}
+              className='bg-zinc-900/50 border-zinc-800 mt-2'
+              placeholder='60'
+              required
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Prerequisites */}
+      <div>
+        <div className='flex justify-between items-center mb-2'>
+          <Label>Prerequisites</Label>
+          <Button type='button' onClick={addPrerequisite} size='sm' variant='outline'>
+            <Plus className='w-3 h-3 mr-1' /> Add
+          </Button>
+        </div>
+        {formData.prerequisites.map((prereq, idx) => (
+          <div key={idx} className='flex gap-2 mb-2'>
+            <Input
+              value={prereq}
+              onChange={(e) => updatePrerequisite(idx, e.target.value)}
+              className='bg-zinc-900/50 border-zinc-800'
+              placeholder='Prerequisite'
+            />
+            <Button type='button' onClick={() => removePrerequisite(idx)} size='sm' variant='ghost' className='text-red-400'>
+              <Trash2 className='w-4 h-4' />
+            </Button>
+          </div>
+        ))}
+      </div>
+
+      {/* Learning Outcomes */}
+      <div>
+        <div className='flex justify-between items-center mb-2'>
+          <Label>Learning Outcomes</Label>
+          <Button type='button' onClick={addLearningOutcome} size='sm' variant='outline'>
+            <Plus className='w-3 h-3 mr-1' /> Add
+          </Button>
+        </div>
+        {formData.learning_outcomes.map((outcome, idx) => (
+          <div key={idx} className='flex gap-2 mb-2'>
+            <Input
+              value={outcome}
+              onChange={(e) => updateLearningOutcome(idx, e.target.value)}
+              className='bg-zinc-900/50 border-zinc-800'
+              placeholder='Learning outcome'
+            />
+            <Button type='button' onClick={() => removeLearningOutcome(idx)} size='sm' variant='ghost' className='text-red-400'>
+              <Trash2 className='w-4 h-4' />
+            </Button>
+          </div>
+        ))}
+      </div>
+
+      {/* Modules */}
+      <div>
+        <div className='flex justify-between items-center mb-4'>
+          <Label className='text-lg font-semibold'>Modules</Label>
+          <Button type='button' onClick={addModule} className='bg-emerald-500 hover:bg-emerald-600'>
+            <Plus className='w-4 h-4 mr-2' /> Add Module
+          </Button>
+        </div>
+
+        {formData.modules.map((module, moduleIdx) => (
+          <Card key={moduleIdx} className='glass border-zinc-800 p-4 mb-4'>
+            <div className='flex justify-between items-start mb-4'>
+              <h4 className='font-semibold'>Module {module.module_number}</h4>
+              <Button type='button' onClick={() => removeModule(moduleIdx)} size='sm' variant='ghost' className='text-red-400'>
+                <Trash2 className='w-4 h-4' />
+              </Button>
+            </div>
+
+            <div className='space-y-3'>
+              <div>
+                <Label>Judul Module</Label>
+                <Input
+                  value={module.title}
+                  onChange={(e) => updateModule(moduleIdx, 'title', e.target.value)}
+                  className='bg-zinc-900/50 border-zinc-800 mt-2'
+                  placeholder='Module title'
+                  required
+                />
+              </div>
+
+              <div>
+                <Label>Deskripsi Module</Label>
+                <Textarea
+                  value={module.description}
+                  onChange={(e) => updateModule(moduleIdx, 'description', e.target.value)}
+                  className='bg-zinc-900/50 border-zinc-800 mt-2'
+                  rows={2}
+                  placeholder='Module description'
+                  required
+                />
+              </div>
+
+              {/* Slides */}
+              <div className='mt-4'>
+                <div className='flex justify-between items-center mb-2'>
+                  <Label className='text-sm font-medium'>Slides</Label>
+                  <Button type='button' onClick={() => addSlide(moduleIdx)} size='sm' variant='outline'>
+                    <Plus className='w-3 h-3 mr-1' /> Add Slide
+                  </Button>
+                </div>
+
+                {module.slides?.map((slide, slideIdx) => (
+                  <Card key={slideIdx} className='bg-zinc-900/30 border-zinc-700 p-3 mb-2'>
+                    <div className='flex justify-between items-start mb-3'>
+                      <span className='text-xs text-gray-400'>Slide {slideIdx + 1}</span>
+                      <Button type='button' onClick={() => removeSlide(moduleIdx, slideIdx)} size='sm' variant='ghost' className='text-red-400 h-6 w-6 p-0'>
+                        <Trash2 className='w-3 h-3' />
+                      </Button>
+                    </div>
+
+                    <div className='space-y-2'>
+                      <Input
+                        value={slide.title}
+                        onChange={(e) => updateSlide(moduleIdx, slideIdx, 'title', e.target.value)}
+                        className='bg-zinc-900/50 border-zinc-800'
+                        placeholder='Slide title'
+                        required
+                      />
+                      <Textarea
+                        value={slide.content}
+                        onChange={(e) => updateSlide(moduleIdx, slideIdx, 'content', e.target.value)}
+                        className='bg-zinc-900/50 border-zinc-800'
+                        rows={2}
+                        placeholder='Slide content'
+                        required
+                      />
+                      <Input
+                        value={slide.code_example || ''}
+                        onChange={(e) => updateSlide(moduleIdx, slideIdx, 'code_example', e.target.value)}
+                        className='bg-zinc-900/50 border-zinc-800'
+                        placeholder='Code example (optional)'
+                      />
+                      <Input
+                        value={slide.image_url || ''}
+                        onChange={(e) => updateSlide(moduleIdx, slideIdx, 'image_url', e.target.value)}
+                        className='bg-zinc-900/50 border-zinc-800'
+                        placeholder='Image URL (optional)'
+                      />
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          </Card>
+        ))}
+      </div>
+
+      <Button type='submit' className='w-full bg-emerald-600 hover:bg-emerald-700'>
+        {courseData ? 'Update Course' : 'Create Course'}
+      </Button>
+    </form>
+  );
+};
+
+
 const ChallengeForm = ({ token, challenge, onSuccess }) => {
   const [formData, setFormData] = useState(challenge || {
     title: '',
