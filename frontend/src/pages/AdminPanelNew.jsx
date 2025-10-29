@@ -61,8 +61,8 @@ const AdminPanelNew = () => {
   if (loading) {
     return (
       <Layout>
-        <div className=\"flex items-center justify-center min-h-screen\">
-          <div className=\"text-emerald-400\">Loading...</div>
+        <div className='flex items-center justify-center min-h-screen'>
+          <div className='text-emerald-400'>Loading...</div>
         </div>
       </Layout>
     );
@@ -70,53 +70,53 @@ const AdminPanelNew = () => {
 
   const adminStats = [
     {
-      icon: <Users className=\"w-6 h-6\" />,
-      label: \"Total Users\",
+      icon: <Users className='w-6 h-6' />,
+      label: 'Total Users',
       value: stats?.total_users || 0,
-      color: \"text-emerald-400\",
-      bg: \"bg-emerald-500/10\"
+      color: 'text-emerald-400',
+      bg: 'bg-emerald-500/10'
     },
     {
-      icon: <Target className=\"w-6 h-6\" />,
-      label: \"Total Challenges\",
+      icon: <Target className='w-6 h-6' />,
+      label: 'Total Challenges',
       value: stats?.total_challenges || 0,
-      color: \"text-cyan-400\",
-      bg: \"bg-cyan-500/10\"
+      color: 'text-cyan-400',
+      bg: 'bg-cyan-500/10'
     },
     {
-      icon: <Activity className=\"w-6 h-6\" />,
-      label: \"Total Attempts\",
+      icon: <Activity className='w-6 h-6' />,
+      label: 'Total Attempts',
       value: stats?.total_attempts || 0,
-      color: \"text-purple-400\",
-      bg: \"bg-purple-500/10\"
+      color: 'text-purple-400',
+      bg: 'bg-purple-500/10'
     },
     {
-      icon: <MessageSquare className=\"w-6 h-6\" />,
-      label: \"Total Feedbacks\",
+      icon: <MessageSquare className='w-6 h-6' />,
+      label: 'Total Feedbacks',
       value: stats?.total_feedbacks || 0,
-      color: \"text-yellow-400\",
-      bg: \"bg-yellow-500/10\"
+      color: 'text-yellow-400',
+      bg: 'bg-yellow-500/10'
     }
   ];
 
   return (
     <Layout>
-      <div className=\"space-y-8\" data-testid=\"admin-panel-container\">
-        <div className=\"flex items-center justify-between\">
+      <div className='space-y-8' data-testid='admin-panel-container'>
+        <div className='flex items-center justify-between'>
           <div>
-            <h1 className=\"text-4xl font-bold mb-3\">Admin Panel</h1>
-            <p className=\"text-gray-400 text-lg\">Kelola platform Tegalsec Lab</p>
+            <h1 className='text-4xl font-bold mb-3'>Admin Panel</h1>
+            <p className='text-gray-400 text-lg'>Kelola platform Tegalsec Lab</p>
           </div>
           <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
             <DialogTrigger asChild>
-              <Button className=\"bg-emerald-600 hover:bg-emerald-700\" data-testid=\"create-challenge-button\">
-                <Plus className=\"w-4 h-4 mr-2\" />
+              <Button className='bg-emerald-600 hover:bg-emerald-700' data-testid='create-challenge-button'>
+                <Plus className='w-4 h-4 mr-2' />
                 Buat Challenge Baru
               </Button>
             </DialogTrigger>
-            <DialogContent className=\"max-w-4xl max-h-[90vh] overflow-y-auto bg-zinc-950 border-zinc-800\">
+            <DialogContent className='max-w-4xl max-h-[90vh] overflow-y-auto bg-zinc-950 border-zinc-800'>
               <DialogHeader>
-                <DialogTitle className=\"text-2xl\">Buat Challenge Baru</DialogTitle>
+                <DialogTitle className='text-2xl'>Buat Challenge Baru</DialogTitle>
               </DialogHeader>
               <ChallengeForm 
                 token={token} 
@@ -130,12 +130,12 @@ const AdminPanelNew = () => {
         </div>
 
         {/* Stats Grid */}
-        <div className=\"grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6\">
+        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6'>
           {adminStats.map((stat, index) => (
-            <Card key={index} className=\"glass border-zinc-800 p-6 card-hover\" data-testid={`admin-stat-${index}`}>
-              <div className=\"flex items-start justify-between\">
+            <Card key={index} className='glass border-zinc-800 p-6 card-hover' data-testid={`admin-stat-${index}`}>
+              <div className='flex items-start justify-between'>
                 <div>
-                  <p className=\"text-gray-400 text-sm mb-2\">{stat.label}</p>
+                  <p className='text-gray-400 text-sm mb-2'>{stat.label}</p>
                   <p className={`text-3xl font-bold ${stat.color}`}>{stat.value}</p>
                 </div>
                 <div className={`w-12 h-12 rounded-lg ${stat.bg} flex items-center justify-center ${stat.color}`}>
@@ -147,32 +147,32 @@ const AdminPanelNew = () => {
         </div>
 
         {/* Tabs */}
-        <Tabs defaultValue=\"challenges\" className=\"w-full\">
-          <TabsList className=\"grid w-full grid-cols-3 bg-zinc-900/50\">
-            <TabsTrigger value=\"challenges\">Challenges</TabsTrigger>
-            <TabsTrigger value=\"users\">Users</TabsTrigger>
-            <TabsTrigger value=\"activity\">Recent Activity</TabsTrigger>
+        <Tabs defaultValue='challenges' className='w-full'>
+          <TabsList className='grid w-full grid-cols-3 bg-zinc-900/50'>
+            <TabsTrigger value='challenges'>Challenges</TabsTrigger>
+            <TabsTrigger value='users'>Users</TabsTrigger>
+            <TabsTrigger value='activity'>Recent Activity</TabsTrigger>
           </TabsList>
 
           {/* Challenges Tab */}
-          <TabsContent value=\"challenges\" className=\"space-y-4 mt-6\">
-            <Card className=\"glass border-zinc-800 overflow-hidden\">
-              <div className=\"overflow-x-auto\">
+          <TabsContent value='challenges' className='space-y-4 mt-6'>
+            <Card className='glass border-zinc-800 overflow-hidden'>
+              <div className='overflow-x-auto'>
                 <Table>
                   <TableHeader>
-                    <TableRow className=\"border-zinc-800\">
+                    <TableRow className='border-zinc-800'>
                       <TableHead>Title</TableHead>
                       <TableHead>Category</TableHead>
                       <TableHead>Difficulty</TableHead>
                       <TableHead>Points</TableHead>
                       <TableHead>Questions</TableHead>
-                      <TableHead className=\"text-right\">Actions</TableHead>
+                      <TableHead className='text-right'>Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {challenges.map((challenge) => (
-                      <TableRow key={challenge.id} className=\"border-zinc-800\">
-                        <TableCell className=\"font-medium\">{challenge.title}</TableCell>
+                      <TableRow key={challenge.id} className='border-zinc-800'>
+                        <TableCell className='font-medium'>{challenge.title}</TableCell>
                         <TableCell>{challenge.category}</TableCell>
                         <TableCell>
                           <span className={`px-2 py-1 rounded text-xs ${
@@ -185,23 +185,23 @@ const AdminPanelNew = () => {
                         </TableCell>
                         <TableCell>{challenge.points}</TableCell>
                         <TableCell>{challenge.questions?.length || 0}</TableCell>
-                        <TableCell className=\"text-right space-x-2\">
+                        <TableCell className='text-right space-x-2'>
                           <Button
-                            variant=\"ghost\"
-                            size=\"sm\"
+                            variant='ghost'
+                            size='sm'
                             onClick={() => setEditingChallenge(challenge)}
                             data-testid={`edit-challenge-${challenge.id}`}
                           >
-                            <Edit className=\"w-4 h-4\" />
+                            <Edit className='w-4 h-4' />
                           </Button>
                           <Button
-                            variant=\"ghost\"
-                            size=\"sm\"
+                            variant='ghost'
+                            size='sm'
                             onClick={() => handleDeleteChallenge(challenge.id)}
-                            className=\"text-red-400 hover:text-red-300\"
+                            className='text-red-400 hover:text-red-300'
                             data-testid={`delete-challenge-${challenge.id}`}
                           >
-                            <Trash2 className=\"w-4 h-4\" />
+                            <Trash2 className='w-4 h-4' />
                           </Button>
                         </TableCell>
                       </TableRow>
@@ -213,12 +213,12 @@ const AdminPanelNew = () => {
           </TabsContent>
 
           {/* Users Tab */}
-          <TabsContent value=\"users\" className=\"space-y-4 mt-6\">
-            <Card className=\"glass border-zinc-800 overflow-hidden\">
-              <div className=\"overflow-x-auto\">
+          <TabsContent value='users' className='space-y-4 mt-6'>
+            <Card className='glass border-zinc-800 overflow-hidden'>
+              <div className='overflow-x-auto'>
                 <Table>
                   <TableHeader>
-                    <TableRow className=\"border-zinc-800\">
+                    <TableRow className='border-zinc-800'>
                       <TableHead>Username</TableHead>
                       <TableHead>Full Name</TableHead>
                       <TableHead>Email</TableHead>
@@ -230,8 +230,8 @@ const AdminPanelNew = () => {
                   </TableHeader>
                   <TableBody>
                     {users.map((user) => (
-                      <TableRow key={user.id} className=\"border-zinc-800\">
-                        <TableCell className=\"font-medium\">@{user.username}</TableCell>
+                      <TableRow key={user.id} className='border-zinc-800'>
+                        <TableCell className='font-medium'>@{user.username}</TableCell>
                         <TableCell>{user.full_name}</TableCell>
                         <TableCell>{user.email}</TableCell>
                         <TableCell>
@@ -242,7 +242,7 @@ const AdminPanelNew = () => {
                           </span>
                         </TableCell>
                         <TableCell>{user.level}</TableCell>
-                        <TableCell className=\"text-emerald-400 font-semibold\">{user.points}</TableCell>
+                        <TableCell className='text-emerald-400 font-semibold'>{user.points}</TableCell>
                         <TableCell>{user.completed_challenges?.length || 0}</TableCell>
                       </TableRow>
                     ))}
@@ -253,19 +253,19 @@ const AdminPanelNew = () => {
           </TabsContent>
 
           {/* Activity Tab */}
-          <TabsContent value=\"activity\" className=\"space-y-6 mt-6\">
-            <Card className=\"glass border-zinc-800 p-6\">
-              <h3 className=\"text-xl font-semibold mb-4 flex items-center gap-2\">
-                <TrendingUp className=\"w-5 h-5 text-emerald-400\" />
+          <TabsContent value='activity' className='space-y-6 mt-6'>
+            <Card className='glass border-zinc-800 p-6'>
+              <h3 className='text-xl font-semibold mb-4 flex items-center gap-2'>
+                <TrendingUp className='w-5 h-5 text-emerald-400' />
                 Recent Attempts
               </h3>
-              <div className=\"space-y-3\">
+              <div className='space-y-3'>
                 {stats?.recent_attempts?.slice(0, 5).map((attempt, idx) => (
-                  <div key={idx} className=\"bg-zinc-900/50 p-4 rounded-lg\">
-                    <div className=\"flex items-center justify-between\">
+                  <div key={idx} className='bg-zinc-900/50 p-4 rounded-lg'>
+                    <div className='flex items-center justify-between'>
                       <div>
-                        <p className=\"text-sm text-gray-400\">User ID: {attempt.user_id.slice(0, 8)}...</p>
-                        <p className=\"font-semibold\">{attempt.correct_count}/{attempt.total_questions} correct</p>
+                        <p className='text-sm text-gray-400'>User ID: {attempt.user_id.slice(0, 8)}...</p>
+                        <p className='font-semibold'>{attempt.correct_count}/{attempt.total_questions} correct</p>
                       </div>
                       <span className={`text-sm font-semibold ${
                         attempt.is_completed ? 'text-emerald-400' : 'text-yellow-400'
@@ -278,23 +278,23 @@ const AdminPanelNew = () => {
               </div>
             </Card>
 
-            <Card className=\"glass border-zinc-800 p-6\">
-              <h3 className=\"text-xl font-semibold mb-4 flex items-center gap-2\">
-                <MessageSquare className=\"w-5 h-5 text-cyan-400\" />
+            <Card className='glass border-zinc-800 p-6'>
+              <h3 className='text-xl font-semibold mb-4 flex items-center gap-2'>
+                <MessageSquare className='w-5 h-5 text-cyan-400' />
                 Recent Feedbacks
               </h3>
-              <div className=\"space-y-3\">
+              <div className='space-y-3'>
                 {stats?.recent_feedbacks?.slice(0, 5).map((feedback, idx) => (
-                  <div key={idx} className=\"bg-zinc-900/50 p-4 rounded-lg\">
-                    <div className=\"flex items-center justify-between mb-2\">
-                      <span className=\"font-semibold\">@{feedback.username}</span>
-                      <div className=\"flex gap-1\">
+                  <div key={idx} className='bg-zinc-900/50 p-4 rounded-lg'>
+                    <div className='flex items-center justify-between mb-2'>
+                      <span className='font-semibold'>@{feedback.username}</span>
+                      <div className='flex gap-1'>
                         {[...Array(5)].map((_, i) => (
                           <span key={i} className={i < feedback.rating ? 'text-yellow-400' : 'text-gray-600'}>★</span>
                         ))}
                       </div>
                     </div>
-                    <p className=\"text-sm text-gray-400\">{feedback.comment}</p>
+                    <p className='text-sm text-gray-400'>{feedback.comment}</p>
                   </div>
                 ))}
               </div>
@@ -306,9 +306,9 @@ const AdminPanelNew = () => {
       {/* Edit Dialog */}
       {editingChallenge && (
         <Dialog open={!!editingChallenge} onOpenChange={() => setEditingChallenge(null)}>
-          <DialogContent className=\"max-w-4xl max-h-[90vh] overflow-y-auto bg-zinc-950 border-zinc-800\">
+          <DialogContent className='max-w-4xl max-h-[90vh] overflow-y-auto bg-zinc-950 border-zinc-800'>
             <DialogHeader>
-              <DialogTitle className=\"text-2xl\">Edit Challenge</DialogTitle>
+              <DialogTitle className='text-2xl'>Edit Challenge</DialogTitle>
             </DialogHeader>
             <ChallengeForm 
               token={token}
@@ -377,73 +377,73 @@ const ChallengeForm = ({ token, challenge, onSuccess }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className=\"space-y-6\">
-      <div className=\"grid md:grid-cols-2 gap-4\">
+    <form onSubmit={handleSubmit} className='space-y-6'>
+      <div className='grid md:grid-cols-2 gap-4'>
         <div>
           <Label>Title</Label>
           <Input
             value={formData.title}
             onChange={(e) => setFormData({...formData, title: e.target.value})}
-            className=\"bg-zinc-900/50 border-zinc-800 mt-2\"
+            className='bg-zinc-900/50 border-zinc-800 mt-2'
             required
           />
         </div>
         <div>
           <Label>Category</Label>
           <Select value={formData.category} onValueChange={(v) => setFormData({...formData, category: v})}>
-            <SelectTrigger className=\"bg-zinc-900/50 border-zinc-800 mt-2\">
+            <SelectTrigger className='bg-zinc-900/50 border-zinc-800 mt-2'>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value=\"phishing\">Phishing</SelectItem>
-              <SelectItem value=\"pretexting\">Pretexting</SelectItem>
-              <SelectItem value=\"baiting\">Baiting</SelectItem>
-              <SelectItem value=\"quid_pro_quo\">Quid Pro Quo</SelectItem>
-              <SelectItem value=\"tailgating\">Tailgating</SelectItem>
-              <SelectItem value=\"money_app\">Money App</SelectItem>
-              <SelectItem value=\"indonesian_case\">Indonesian Case</SelectItem>
+              <SelectItem value='phishing'>Phishing</SelectItem>
+              <SelectItem value='pretexting'>Pretexting</SelectItem>
+              <SelectItem value='baiting'>Baiting</SelectItem>
+              <SelectItem value='quid_pro_quo'>Quid Pro Quo</SelectItem>
+              <SelectItem value='tailgating'>Tailgating</SelectItem>
+              <SelectItem value='money_app'>Money App</SelectItem>
+              <SelectItem value='indonesian_case'>Indonesian Case</SelectItem>
             </SelectContent>
           </Select>
         </div>
       </div>
 
-      <div className=\"grid md:grid-cols-3 gap-4\">
+      <div className='grid md:grid-cols-3 gap-4'>
         <div>
           <Label>Difficulty</Label>
           <Select value={formData.difficulty} onValueChange={(v) => setFormData({...formData, difficulty: v})}>
-            <SelectTrigger className=\"bg-zinc-900/50 border-zinc-800 mt-2\">
+            <SelectTrigger className='bg-zinc-900/50 border-zinc-800 mt-2'>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value=\"beginner\">Beginner</SelectItem>
-              <SelectItem value=\"intermediate\">Intermediate</SelectItem>
-              <SelectItem value=\"advanced\">Advanced</SelectItem>
+              <SelectItem value='beginner'>Beginner</SelectItem>
+              <SelectItem value='intermediate'>Intermediate</SelectItem>
+              <SelectItem value='advanced'>Advanced</SelectItem>
             </SelectContent>
           </Select>
         </div>
         <div>
           <Label>Cialdini Principle</Label>
           <Select value={formData.cialdini_principle} onValueChange={(v) => setFormData({...formData, cialdini_principle: v})}>
-            <SelectTrigger className=\"bg-zinc-900/50 border-zinc-800 mt-2\">
+            <SelectTrigger className='bg-zinc-900/50 border-zinc-800 mt-2'>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value=\"authority\">Authority</SelectItem>
-              <SelectItem value=\"reciprocity\">Reciprocity</SelectItem>
-              <SelectItem value=\"scarcity\">Scarcity</SelectItem>
-              <SelectItem value=\"social_proof\">Social Proof</SelectItem>
-              <SelectItem value=\"liking\">Liking</SelectItem>
-              <SelectItem value=\"commitment\">Commitment</SelectItem>
+              <SelectItem value='authority'>Authority</SelectItem>
+              <SelectItem value='reciprocity'>Reciprocity</SelectItem>
+              <SelectItem value='scarcity'>Scarcity</SelectItem>
+              <SelectItem value='social_proof'>Social Proof</SelectItem>
+              <SelectItem value='liking'>Liking</SelectItem>
+              <SelectItem value='commitment'>Commitment</SelectItem>
             </SelectContent>
           </Select>
         </div>
         <div>
           <Label>Points</Label>
           <Input
-            type=\"number\"
+            type='number'
             value={formData.points}
             onChange={(e) => setFormData({...formData, points: parseInt(e.target.value)})}
-            className=\"bg-zinc-900/50 border-zinc-800 mt-2\"
+            className='bg-zinc-900/50 border-zinc-800 mt-2'
           />
         </div>
       </div>
@@ -453,7 +453,7 @@ const ChallengeForm = ({ token, challenge, onSuccess }) => {
         <Textarea
           value={formData.description}
           onChange={(e) => setFormData({...formData, description: e.target.value})}
-          className=\"bg-zinc-900/50 border-zinc-800 mt-2 min-h-20\"
+          className='bg-zinc-900/50 border-zinc-800 mt-2 min-h-20'
           required
         />
       </div>
@@ -463,29 +463,29 @@ const ChallengeForm = ({ token, challenge, onSuccess }) => {
         <Textarea
           value={formData.scenario}
           onChange={(e) => setFormData({...formData, scenario: e.target.value})}
-          className=\"bg-zinc-900/50 border-zinc-800 mt-2 min-h-32\"
+          className='bg-zinc-900/50 border-zinc-800 mt-2 min-h-32'
           required
         />
       </div>
 
       {/* Questions */}
-      <div className=\"space-y-4\">
-        <div className=\"flex items-center justify-between\">
-          <Label className=\"text-lg\">Questions</Label>
-          <Button type=\"button\" onClick={addQuestion} variant=\"outline\" size=\"sm\">
-            <Plus className=\"w-4 h-4 mr-2\" />
+      <div className='space-y-4'>
+        <div className='flex items-center justify-between'>
+          <Label className='text-lg'>Questions</Label>
+          <Button type='button' onClick={addQuestion} variant='outline' size='sm'>
+            <Plus className='w-4 h-4 mr-2' />
             Add Question
           </Button>
         </div>
 
         {formData.questions.map((q, idx) => (
-          <Card key={idx} className=\"bg-zinc-900/30 border-zinc-800 p-4 space-y-3\">
+          <Card key={idx} className='bg-zinc-900/30 border-zinc-800 p-4 space-y-3'>
             <Label>Question {idx + 1}</Label>
             <Textarea
               value={q.question}
               onChange={(e) => updateQuestion(idx, 'question', e.target.value)}
-              className=\"bg-zinc-900/50 border-zinc-800\"
-              placeholder=\"Enter question\"
+              className='bg-zinc-900/50 border-zinc-800'
+              placeholder='Enter question'
             />
             
             <Label>Options</Label>
@@ -498,21 +498,21 @@ const ChallengeForm = ({ token, challenge, onSuccess }) => {
                   newOptions[oIdx] = e.target.value;
                   updateQuestion(idx, 'options', newOptions);
                 }}
-                className=\"bg-zinc-900/50 border-zinc-800\"
+                className='bg-zinc-900/50 border-zinc-800'
                 placeholder={`Option ${oIdx + 1}`}
               />
             ))}
             
-            <div className=\"grid grid-cols-2 gap-4\">
+            <div className='grid grid-cols-2 gap-4'>
               <div>
                 <Label>Correct Answer (index)</Label>
                 <Input
-                  type=\"number\"
+                  type='number'
                   value={q.correct_answer}
                   onChange={(e) => updateQuestion(idx, 'correct_answer', parseInt(e.target.value))}
-                  className=\"bg-zinc-900/50 border-zinc-800 mt-2\"
-                  min=\"0\"
-                  max=\"3\"
+                  className='bg-zinc-900/50 border-zinc-800 mt-2'
+                  min='0'
+                  max='3'
                 />
               </div>
             </div>
@@ -522,15 +522,15 @@ const ChallengeForm = ({ token, challenge, onSuccess }) => {
               <Textarea
                 value={q.explanation}
                 onChange={(e) => updateQuestion(idx, 'explanation', e.target.value)}
-                className=\"bg-zinc-900/50 border-zinc-800 mt-2\"
-                placeholder=\"Explain why this is the correct answer\"
+                className='bg-zinc-900/50 border-zinc-800 mt-2'
+                placeholder='Explain why this is the correct answer'
               />
             </div>
           </Card>
         ))}
       </div>
 
-      <Button type=\"submit\" className=\"w-full bg-emerald-600 hover:bg-emerald-700\">
+      <Button type='submit' className='w-full bg-emerald-600 hover:bg-emerald-700'>
         {challenge ? 'Update Challenge' : 'Create Challenge'}
       </Button>
     </form>
