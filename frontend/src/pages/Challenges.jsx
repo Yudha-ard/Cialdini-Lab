@@ -277,6 +277,99 @@ const Challenges = () => {
           ))}
         </div>
 
+
+            {filteredChallenges.length === 0 && (
+              <div className="text-center py-16">
+                <p className="text-gray-400 text-lg">Tidak ada challenge yang sesuai dengan filter</p>
+              </div>
+            )}
+          </TabsContent>
+
+          {/* Individual Cialdini Principle Tabs */}
+          {['reciprocity', 'commitment', 'social_proof', 'authority', 'liking', 'scarcity'].map(principle => {
+            const principleData = groupByCialdini();
+            const principleChallenges = principleData[principle] || [];
+            
+            return (
+              <TabsContent key={principle} value={principle} className="space-y-6 mt-6">
+                {/* Principle Header */}
+                <Card className="glass border-zinc-800 p-6 bg-gradient-to-r from-emerald-500/10 to-cyan-500/10">
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 rounded-lg bg-emerald-500/20 flex items-center justify-center text-emerald-400">
+                      {getCialdiniIcon(principle)}
+                    </div>
+                    <div className="flex-1">
+                      <h2 className="text-2xl font-bold mb-2 text-emerald-400">{getCialdiniLabel(principle)}</h2>
+                      <p className="text-gray-300">{getCialdiniDescription(principle)}</p>
+                      <div className="mt-4 flex items-center gap-4">
+                        <Badge variant="outline" className="border-emerald-500/50 text-emerald-400">
+                          {principleChallenges.length} Challenges
+                        </Badge>
+                        <span className="text-sm text-gray-400">
+                          Total Points: {principleChallenges.reduce((sum, c) => sum + (c.points || 0), 0)}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+
+                {/* Challenges Grid for this principle */}
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {principleChallenges.map((challenge) => (
+                    <Card 
+                      key={challenge.id} 
+                      className={`glass border-zinc-800 p-6 card-hover relative overflow-hidden ${
+                        isCompleted(challenge.id) ? 'border-emerald-500/50' : ''
+                      }`}
+                      data-testid={`challenge-card-${challenge.id}`}
+                    >
+                      {isCompleted(challenge.id) && (
+                        <div className="absolute top-3 right-3">
+                          <Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500/50">
+                            ✓ Selesai
+                          </Badge>
+                        </div>
+                      )}
+                      
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
+                          challenge.category === 'indonesian_case' ? 'bg-red-500/20 text-red-400' : 'bg-cyan-500/20 text-cyan-400'
+                        }`}>
+                          {getCategoryIcon(challenge.category)}
+                        </div>
+                        <span className="text-xs text-gray-400">{getCategoryLabel(challenge.category)}</span>
+                      </div>
+
+                      <h3 className="text-xl font-semibold mb-2">{challenge.title}</h3>
+                      <p className="text-gray-400 text-sm mb-4 line-clamp-2">{challenge.description}</p>
+
+                      <div className="flex items-center justify-between mb-4">
+                        <Badge className={getDifficultyColor(challenge.difficulty)}>
+                          {getDifficultyLabel(challenge.difficulty)}
+                        </Badge>
+                        <span className="text-yellow-400 font-semibold">{challenge.points} pts</span>
+                      </div>
+
+                      <Link to={`/challenges/${challenge.id}`}>
+                        <Button className="w-full bg-emerald-600 hover:bg-emerald-700 btn-cyber">
+                          {isCompleted(challenge.id) ? 'Lihat Lagi' : 'Mulai Challenge'}
+                          <ChevronRight className="ml-2 w-4 h-4" />
+                        </Button>
+                      </Link>
+                    </Card>
+                  ))}
+                </div>
+
+                {principleChallenges.length === 0 && (
+                  <div className="text-center py-16">
+                    <p className="text-gray-400 text-lg">Belum ada challenge untuk prinsip ini</p>
+                  </div>
+                )}
+              </TabsContent>
+            );
+          })}
+        </Tabs>
+
         {filteredChallenges.length === 0 && (
           <div className="text-center py-16">
             <p className="text-gray-400 text-lg">Tidak ada challenge yang sesuai dengan filter</p>
