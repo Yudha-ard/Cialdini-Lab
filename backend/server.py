@@ -745,6 +745,211 @@ async def get_user_badges(current_user: dict = Depends(get_current_user)):
     
     return {"earned_badges": earned_badges}
 
+# ===== COURSES SYSTEM =====
+@api_router.get("/courses")
+async def get_courses(category: Optional[str] = None):
+    query = {}
+    if category:
+        query['category'] = category
+    courses = await db.courses.find(query, {"_id": 0}).to_list(1000)
+    for course in courses:
+        if isinstance(course.get('created_at'), str):
+            course['created_at'] = datetime.fromisoformat(course['created_at'])
+    return courses
+
+@api_router.get("/courses/{course_id}")
+async def get_course(course_id: str):
+    course = await db.courses.find_one({"id": course_id}, {"_id": 0})
+    if not course:
+        raise HTTPException(status_code=404, detail="Course tidak ditemukan")
+    if isinstance(course.get('created_at'), str):
+        course['created_at'] = datetime.fromisoformat(course['created_at'])
+    return course
+
+@api_router.post("/admin/courses")
+async def create_course(course: Course, current_user: dict = Depends(get_current_user)):
+    if current_user.get('role') != 'admin':
+        raise HTTPException(status_code=403, detail="Akses ditolak")
+    
+    course_dict = course.model_dump()
+    course_dict['created_at'] = course_dict['created_at'].isoformat()
+    course_dict['created_by'] = current_user['username']
+    await db.courses.insert_one(course_dict)
+    return course
+
+@api_router.put("/admin/courses/{course_id}")
+async def update_course(course_id: str, course: Course, current_user: dict = Depends(get_current_user)):
+    if current_user.get('role') != 'admin':
+        raise HTTPException(status_code=403, detail="Akses ditolak")
+    
+    course_dict = course.model_dump()
+    course_dict['created_at'] = course_dict['created_at'].isoformat()
+    
+    result = await db.courses.update_one(
+        {"id": course_id},
+        {"$set": course_dict}
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Course tidak ditemukan")
+    
+    return {"message": "Course berhasil diupdate"}
+
+@api_router.delete("/admin/courses/{course_id}")
+async def delete_course(course_id: str, current_user: dict = Depends(get_current_user)):
+    if current_user.get('role') != 'admin':
+        raise HTTPException(status_code=403, detail="Akses ditolak")
+    
+    result = await db.courses.delete_one({"id": course_id})
+    
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Course tidak ditemukan")
+    
+    return {"message": "Course berhasil dihapus"}
+
+@api_router.post("/courses/{course_id}/progress")
+async def update_course_progress(course_id: str, progress_data: dict, current_user: dict = Depends(get_current_user)):
+    module_number = progress_data.get('module_number')
+    slide_number = progress_data.get('slide_number')
+    
+    # Get or create progress
+    progress = await db.course_progress.find_one({
+        "user_id": current_user['id'],
+        "course_id": course_id
+    })
+    
+    if not progress:
+        new_progress = CourseProgress(
+            user_id=current_user['id'],
+            course_id=course_id
+        )
+        progress_dict = new_progress.model_dump()
+        progress_dict['started_at'] = progress_dict['started_at'].isoformat()
+        await db.course_progress.insert_one(progress_dict)
+        progress = progress_dict
+    
+    # Update progress
+    completed_modules = progress.get('completed_modules', [])
+    if module_number not in completed_modules:
+        completed_modules.append(module_number)
+    
+    await db.course_progress.update_one(
+        {"user_id": current_user['id'], "course_id": course_id},
+        {"$set": {
+            "completed_modules": completed_modules,
+            "current_slide": slide_number
+        }}
+    )
+    
+    return {"message": "Progress updated"}
+
+@api_router.get("/courses/{course_id}/progress")
+async def get_course_progress(course_id: str, current_user: dict = Depends(get_current_user)):
+    progress = await db.course_progress.find_one({
+        "user_id": current_user['id'],
+        "course_id": course_id
+    }, {"_id": 0})
+    
+    return progress or {"completed_modules": [], "current_slide": 0}
+
+# ===== CERTIFICATES =====
+@api_router.get("/certificates")
+async def get_user_certificates(current_user: dict = Depends(get_current_user)):
+    certificates = await db.certificates.find(
+        {"user_id": current_user['id']},
+        {"_id": 0}
+    ).to_list(100)
+    
+    # Check for auto-issuable certificates
+    completed = len(current_user.get('completed_challenges', []))
+    total_challenges = await db.challenges.count_documents({})
+    
+    # Auto-issue certificate for completing all challenges
+    if completed == total_challenges and completed > 0:
+        existing = await db.certificates.find_one({
+            "user_id": current_user['id'],
+            "achievement_type": "all_challenges"
+        })
+        
+        if not existing:
+            cert = Certificate(
+                user_id=current_user['id'],
+                username=current_user['username'],
+                full_name=current_user['full_name'],
+                achievement_type="all_challenges",
+                achievement_title="Master of Social Engineering Defense"
+            )
+            cert_dict = cert.model_dump()
+            cert_dict['issued_at'] = cert_dict['issued_at'].isoformat()
+            await db.certificates.insert_one(cert_dict)
+            certificates.append(cert_dict)
+    
+    return certificates
+
+@api_router.get("/certificates/{certificate_id}")
+async def get_certificate(certificate_id: str):
+    cert = await db.certificates.find_one({"id": certificate_id}, {"_id": 0})
+    if not cert:
+        raise HTTPException(status_code=404, detail="Certificate tidak ditemukan")
+    return cert
+
+# ===== QUIZ MODE (RAPID FIRE) =====
+@api_router.get("/quiz/random")
+async def get_random_quiz():
+    # Get 10 random questions from challenges
+    challenges = await db.challenges.find({}, {"_id": 0}).to_list(1000)
+    if not challenges:
+        raise HTTPException(status_code=404, detail="Tidak ada challenges")
+    
+    import random
+    random.shuffle(challenges)
+    
+    quiz_questions = []
+    for challenge in challenges[:10]:
+        if challenge.get('questions'):
+            q = random.choice(challenge['questions'])
+            quiz_questions.append({
+                "challenge_title": challenge['title'],
+                "question": q['question'],
+                "options": q['options'],
+                "correct_answer": q['correct_answer'],
+                "points": 10
+            })
+    
+    return {
+        "questions": quiz_questions,
+        "time_limit_seconds": 60,
+        "total_points": len(quiz_questions) * 10
+    }
+
+@api_router.post("/quiz/submit")
+async def submit_quiz(answers: dict, current_user: dict = Depends(get_current_user)):
+    user_answers = answers.get('answers', [])
+    quiz_questions = answers.get('questions', [])
+    time_taken = answers.get('time_taken', 60)
+    
+    correct = sum(1 for ua, q in zip(user_answers, quiz_questions) if ua == q.get('correct_answer'))
+    total = len(quiz_questions)
+    points = correct * 10
+    
+    # Bonus for speed
+    if time_taken < 40:
+        points = int(points * 1.5)
+    
+    # Update user points
+    new_points = current_user.get('points', 0) + points
+    await db.users.update_one(
+        {"id": current_user['id']},
+        {"$set": {"points": new_points}}
+    )
+    
+    return {
+        "correct": correct,
+        "total": total,
+        "points_earned": points,
+        "accuracy": round((correct / total) * 100, 1)
+    }
+
 app.include_router(api_router)
 
 app.add_middleware(
