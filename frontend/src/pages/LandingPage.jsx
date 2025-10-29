@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import ForgotPassword from '@/components/ForgotPassword';
 import axios from 'axios';
 import { API, AuthContext } from '@/App';
 import { toast } from 'sonner';
