@@ -53,6 +53,12 @@ class User(BaseModel):
     completed_challenges: List[str] = []
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
+class QuestionItem(BaseModel):
+    question: str
+    options: List[str]
+    correct_answer: int
+    explanation: str
+
 class Challenge(BaseModel):
     model_config = ConfigDict(extra="ignore")
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
@@ -60,15 +66,15 @@ class Challenge(BaseModel):
     category: str  # phishing, pretexting, baiting, quid_pro_quo, tailgating, money_app, indonesian_case
     difficulty: str  # beginner, intermediate, advanced
     cialdini_principle: str  # reciprocity, commitment, social_proof, authority, liking, scarcity
+    challenge_type: str = "multi_choice"  # multi_choice, chat_simulation, email_analysis, spot_difference, timeline_ordering
     description: str
     scenario: str
-    question: str
-    options: List[str]
-    correct_answer: int
-    explanation: str
+    questions: List[QuestionItem]  # Multi-question support
     points: int
     tips: List[str]
     real_case_reference: Optional[str] = None
+    time_limit_seconds: Optional[int] = None
+    interactive_data: Optional[dict] = None  # For chat, email, etc simulations
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 class ChallengeAttempt(BaseModel):
@@ -76,10 +82,23 @@ class ChallengeAttempt(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     user_id: str
     challenge_id: str
-    selected_answer: int
-    is_correct: bool
+    answers: List[int]  # Multiple answers for multi-question
+    correct_count: int
+    total_questions: int
+    is_completed: bool
     points_earned: int
+    time_taken_seconds: Optional[int] = None
     timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class ChallengeFeedback(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str
+    challenge_id: str
+    rating: int  # 1-5
+    comment: str
+    username: str
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 class EducationContent(BaseModel):
     model_config = ConfigDict(extra="ignore")
