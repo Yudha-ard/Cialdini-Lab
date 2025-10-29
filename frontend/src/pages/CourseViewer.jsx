@@ -82,8 +82,8 @@ const CourseViewer = () => {
     }
   };
 
-  if (loading) return <Layout><div className=\"flex items-center justify-center min-h-screen\"><div className=\"text-emerald-400\">Loading...</div></div></Layout>;
-  if (!course) return <Layout><div className=\"text-center py-16\"><p className=\"text-gray-400\">Course tidak ditemukan</p></div></Layout>;
+  if (loading) return <Layout><div className='flex items-center justify-center min-h-screen'><div className='text-emerald-400'>Loading...</div></div></Layout>;
+  if (!course) return <Layout><div className='text-center py-16'><p className='text-gray-400'>Course tidak ditemukan</p></div></Layout>;
 
   const currentModule = course.modules[currentModuleIndex];
   const currentSlide = currentModule.slides[currentSlideIndex];
