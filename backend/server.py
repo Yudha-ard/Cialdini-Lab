@@ -873,21 +873,15 @@ async def get_course(course_id: str):
     return course
 
 @api_router.post("/admin/courses")
-async def create_course(course: Course, current_user: dict = Depends(get_current_user)):
-    if current_user.get('role') != 'admin':
-        raise HTTPException(status_code=403, detail="Akses ditolak")
-    
+async def create_course(course: Course, admin_user: dict = Depends(require_admin)):
     course_dict = course.model_dump()
     course_dict['created_at'] = course_dict['created_at'].isoformat()
-    course_dict['created_by'] = current_user['username']
+    course_dict['created_by'] = admin_user['username']
     await db.courses.insert_one(course_dict)
     return course
 
 @api_router.put("/admin/courses/{course_id}")
-async def update_course(course_id: str, course: Course, current_user: dict = Depends(get_current_user)):
-    if current_user.get('role') != 'admin':
-        raise HTTPException(status_code=403, detail="Akses ditolak")
-    
+async def update_course(course_id: str, course: Course, admin_user: dict = Depends(require_admin)):
     course_dict = course.model_dump()
     course_dict['created_at'] = course_dict['created_at'].isoformat()
     
@@ -906,10 +900,7 @@ async def update_course(course_id: str, course: Course, current_user: dict = Dep
     return {"message": "Course berhasil diupdate"}
 
 @api_router.delete("/admin/courses/{course_id}")
-async def delete_course(course_id: str, current_user: dict = Depends(get_current_user)):
-    if current_user.get('role') != 'admin':
-        raise HTTPException(status_code=403, detail="Akses ditolak")
-    
+async def delete_course(course_id: str, admin_user: dict = Depends(require_admin)):
     result = await db.courses.delete_one({"id": course_id})
     
     if result.deleted_count == 0:
