@@ -785,6 +785,10 @@ async def update_course(course_id: str, course: Course, current_user: dict = Dep
     course_dict = course.model_dump()
     course_dict['created_at'] = course_dict['created_at'].isoformat()
     
+    # Remove id field to prevent overwriting the existing course ID
+    if 'id' in course_dict:
+        del course_dict['id']
+    
     result = await db.courses.update_one(
         {"id": course_id},
         {"$set": course_dict}
