@@ -288,6 +288,35 @@ async def get_leaderboard():
     sorted_users = sorted(users, key=lambda x: x.get('points', 0), reverse=True)[:10]
     return sorted_users
 
+# ===== CHALLENGE FEEDBACK =====
+@api_router.post("/challenges/{challenge_id}/feedback")
+async def add_feedback(challenge_id: str, feedback_data: dict, current_user: dict = Depends(get_current_user)):
+    challenge = await db.challenges.find_one({"id": challenge_id}, {"_id": 0})
+    if not challenge:
+        raise HTTPException(status_code=404, detail="Challenge tidak ditemukan")
+    
+    feedback = ChallengeFeedback(
+        user_id=current_user['id'],
+        challenge_id=challenge_id,
+        rating=feedback_data.get('rating', 5),
+        comment=feedback_data.get('comment', ''),
+        username=current_user['username']
+    )
+    
+    feedback_dict = feedback.model_dump()
+    feedback_dict['created_at'] = feedback_dict['created_at'].isoformat()
+    await db.feedbacks.insert_one(feedback_dict)
+    
+    return {"message": "Feedback berhasil dikirim"}
+
+@api_router.get("/challenges/{challenge_id}/feedback")
+async def get_feedback(challenge_id: str):
+    feedbacks = await db.feedbacks.find({"challenge_id": challenge_id}, {"_id": 0}).sort("created_at", -1).to_list(100)
+    for fb in feedbacks:
+        if isinstance(fb['created_at'], str):
+            fb['created_at'] = datetime.fromisoformat(fb['created_at'])
+    return feedbacks
+
 # ===== USER PROGRESS =====
 @api_router.get("/progress")
 async def get_progress(current_user: dict = Depends(get_current_user)):
