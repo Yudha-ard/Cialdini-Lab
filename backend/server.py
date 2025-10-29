@@ -264,6 +264,9 @@ def check_rate_limit(identifier: str, limit: int = RATE_LIMIT_LOGIN, window: int
 # ===== AUTH ROUTES =====
 @api_router.post("/auth/register")
 async def register(user_data: UserRegister):
+    # Rate limiting by username
+    check_rate_limit(f"register_{user_data.username}", limit=3, window=3600)  # 3 attempts per hour
+    
     # Check if username exists
     existing = await db.users.find_one({"username": user_data.username})
     if existing:
