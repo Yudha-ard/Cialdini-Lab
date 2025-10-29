@@ -567,6 +567,102 @@ const AdminPanelNew = () => {
 
 // Challenge Form Component
 
+
+// Education Form Component
+const EducationForm = ({ token, educationData, onSuccess }) => {
+  const [formData, setFormData] = useState(educationData || {
+    title: '',
+    content_type: 'cialdini_principle',
+    content: '',
+    principle: ''
+  });
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    try {
+      if (educationData) {
+        await axios.put(`${API}/admin/education/${educationData.id}`, formData, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        toast.success('Konten edukasi berhasil diupdate');
+      } else {
+        await axios.post(`${API}/admin/education`, formData, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        toast.success('Konten edukasi berhasil dibuat');
+      }
+      onSuccess();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Gagal menyimpan konten edukasi');
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className='space-y-4'>
+      <div>
+        <Label>Judul</Label>
+        <Input
+          value={formData.title}
+          onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+          className='bg-zinc-900/50 border-zinc-800 mt-2'
+          placeholder='Judul konten edukasi'
+          required
+        />
+      </div>
+
+      <div>
+        <Label>Tipe Konten</Label>
+        <Select value={formData.content_type} onValueChange={(v) => setFormData({ ...formData, content_type: v })}>
+          <SelectTrigger className='bg-zinc-900/50 border-zinc-800 mt-2'>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value='cialdini_principle'>Cialdini Principle</SelectItem>
+            <SelectItem value='prevention_tips'>Prevention Tips</SelectItem>
+            <SelectItem value='case_study'>Case Study</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div>
+        <Label>Prinsip Cialdini (Optional)</Label>
+        <Select value={formData.principle || ''} onValueChange={(v) => setFormData({ ...formData, principle: v })}>
+          <SelectTrigger className='bg-zinc-900/50 border-zinc-800 mt-2'>
+            <SelectValue placeholder="Pilih prinsip" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value=''>Tidak Ada</SelectItem>
+            <SelectItem value='reciprocity'>Reciprocity</SelectItem>
+            <SelectItem value='commitment'>Commitment</SelectItem>
+            <SelectItem value='social_proof'>Social Proof</SelectItem>
+            <SelectItem value='authority'>Authority</SelectItem>
+            <SelectItem value='liking'>Liking</SelectItem>
+            <SelectItem value='scarcity'>Scarcity</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div>
+        <Label>Konten</Label>
+        <Textarea
+          value={formData.content}
+          onChange={(e) => setFormData({ ...formData, content: e.target.value })}
+          className='bg-zinc-900/50 border-zinc-800 mt-2'
+          rows={8}
+          placeholder='Isi konten edukasi...'
+          required
+        />
+      </div>
+
+      <Button type='submit' className='w-full bg-emerald-600 hover:bg-emerald-700'>
+        {educationData ? 'Update Edukasi' : 'Create Edukasi'}
+      </Button>
+    </form>
+  );
+};
+
+
 // Course Form Component
 const CourseForm = ({ token, courseData, onSuccess }) => {
   const [formData, setFormData] = useState(courseData || {
