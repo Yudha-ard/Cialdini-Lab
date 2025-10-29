@@ -94,6 +94,8 @@ const AdminPanelNew = () => {
       fetchData();
     } catch (error) {
       toast.error('Gagal menghapus konten edukasi');
+    }
+  };
 
   const handleDeleteUser = async (userId) => {
     if (!confirm('Yakin ingin menghapus user ini?')) return;
@@ -106,9 +108,6 @@ const AdminPanelNew = () => {
       fetchData();
     } catch (error) {
       toast.error(error.response?.data?.detail || 'Gagal menghapus user');
-    }
-  };
-
     }
   };
 
