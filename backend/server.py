@@ -295,6 +295,9 @@ async def register(user_data: UserRegister):
 
 @api_router.post("/auth/login")
 async def login(login_data: UserLogin):
+    # Rate limiting by username
+    check_rate_limit(f"login_{login_data.username}", limit=5, window=300)  # 5 attempts per 5 minutes
+    
     user = await db.users.find_one({"username": login_data.username}, {"_id": 0})
     if not user or not verify_password(login_data.password, user['password']):
         raise HTTPException(status_code=401, detail="Username atau password salah")
