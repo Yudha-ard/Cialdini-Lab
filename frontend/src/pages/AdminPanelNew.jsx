@@ -602,6 +602,72 @@ const AdminPanelNew = () => {
       {editingChallenge && (
         <Dialog open={!!editingChallenge} onOpenChange={() => setEditingChallenge(null)}>
           <DialogContent className='max-w-4xl max-h-[90vh] overflow-y-auto bg-zinc-950 border-zinc-800'>
+
+// User Edit Form Component
+const UserEditForm = ({ token, userData, onSuccess }) => {
+  const [formData, setFormData] = useState({
+    full_name: userData.full_name,
+    email: userData.email,
+    password: ''
+  });
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    try {
+      await axios.put(`${API}/admin/users/${userData.id}`, {
+        full_name: formData.full_name,
+        email: formData.email,
+        password: formData.password || undefined
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      toast.success('User berhasil diupdate');
+      onSuccess();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Gagal update user');
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className='space-y-4'>
+      <div>
+        <Label>Nama Lengkap</Label>
+        <Input
+          value={formData.full_name}
+          onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
+          className='bg-zinc-900/50 border-zinc-800 mt-2'
+          required
+        />
+      </div>
+      <div>
+        <Label>Email</Label>
+        <Input
+          type='email'
+          value={formData.email}
+          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+          className='bg-zinc-900/50 border-zinc-800 mt-2'
+          required
+        />
+      </div>
+      <div>
+        <Label>Password Baru (Optional)</Label>
+        <Input
+          type='password'
+          value={formData.password}
+          onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+          className='bg-zinc-900/50 border-zinc-800 mt-2'
+          placeholder='Kosongkan jika tidak ingin ubah password'
+        />
+      </div>
+      <Button type='submit' className='w-full bg-emerald-600 hover:bg-emerald-700'>
+        Update User
+      </Button>
+    </form>
+  );
+};
+
+
             <DialogHeader>
               <DialogTitle className='text-2xl'>Edit Challenge</DialogTitle>
             </DialogHeader>
