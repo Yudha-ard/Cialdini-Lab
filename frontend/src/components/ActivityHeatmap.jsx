@@ -1,6 +1,5 @@
 import React from 'react';
 import { Card } from '@/components/ui/card';
-import { Tooltip } from '@/components/ui/tooltip';
 
 const ActivityHeatmap = ({ activityData = [] }) => {
   // Generate last 12 weeks (84 days)
@@ -13,10 +12,14 @@ const ActivityHeatmap = ({ activityData = [] }) => {
   
   // Create activity map for quick lookup
   const activityMap = {};
-  activityData.forEach(activity => {
-    const date = new Date(activity.date).toISOString().split('T')[0];
-    activityMap[date] = activity.count;
-  });
+  if (Array.isArray(activityData)) {
+    activityData.forEach(activity => {
+      if (activity && activity.date) {
+        const date = new Date(activity.date).toISOString().split('T')[0];
+        activityMap[date] = activity.count || 0;
+      }
+    });
+  }
   
   // Generate calendar grid
   const calendar = [];
@@ -64,7 +67,7 @@ const ActivityHeatmap = ({ activityData = [] }) => {
     <Card className="glass border-zinc-800 p-6">
       <h3 className="text-lg font-semibold mb-4">Aktivitas Harian</h3>
       
-      <div className="flex gap-1">
+      <div className="flex gap-1 overflow-x-auto">
         {/* Day labels */}
         <div className="flex flex-col gap-1 text-xs text-gray-500 mr-2">
           {dayNames.map((day, idx) => (
