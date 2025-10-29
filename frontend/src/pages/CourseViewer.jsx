@@ -149,11 +149,13 @@ const CourseViewer = () => {
           <h2 className=\"text-3xl font-bold mb-6 text-emerald-400\">{currentSlide.title}</h2>
           
           <div className=\"prose prose-invert max-w-none\">
-            {currentSlide.content.split('\\n\\n').map((paragraph, idx) => {
+            {currentSlide.content.split('\
+\
+').map((paragraph, idx) => {
               // Check if heading (bold)
               if (paragraph.startsWith('**') && paragraph.includes(':**')) {
                 const parts = paragraph.split(':**');
-                const heading = parts[0].replace(/\\*\\*/g, '');
+                const heading = parts[0].replace(/\*\*/g, '');
                 const content = parts[1];
                 return (
                   <div key={idx} className=\"mb-6\">
@@ -164,8 +166,11 @@ const CourseViewer = () => {
               }
               
               // Bullet list
-              if (paragraph.includes('\\n-') || paragraph.includes('\\n✓')) {
-                const items = paragraph.split('\\n').filter(line => line.trim());
+              if (paragraph.includes('\
+-') || paragraph.includes('\
+✓')) {
+                const items = paragraph.split('\
+').filter(line => line.trim());
                 return (
                   <ul key={idx} className=\"space-y-2 mb-6\">
                     {items.map((item, itemIdx) => {
@@ -178,7 +183,7 @@ const CourseViewer = () => {
                         );
                       }
                       if (item.startsWith('**')) {
-                        return <p key={itemIdx} className=\"font-semibold text-white mt-4\">{item.replace(/\\*\\*/g, '')}</p>;
+                        return <p key={itemIdx} className=\"font-semibold text-white mt-4\">{item.replace(/\*\*/g, '')}</p>;
                       }
                       return null;
                     })}
