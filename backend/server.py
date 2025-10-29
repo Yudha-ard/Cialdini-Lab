@@ -221,6 +221,46 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
     except Exception:
         raise HTTPException(status_code=401, detail="Invalid token")
 
+
+# ===== RBAC HELPER =====
+async def require_admin(current_user: dict = Depends(get_current_user)):
+    """Dependency untuk memastikan user adalah admin"""
+    if current_user.get('role') != 'admin':
+        raise HTTPException(
+            status_code=403, 
+            detail="Forbidden: Admin access required"
+        )
+    return current_user
+
+# ===== RATE LIMITING =====
+from collections import defaultdict
+from time import time
+
+# Simple in-memory rate limiter
+rate_limit_store = defaultdict(list)
+RATE_LIMIT_LOGIN = 5  # 5 attempts
+RATE_LIMIT_WINDOW = 300  # 5 minutes
+
+def check_rate_limit(identifier: str, limit: int = RATE_LIMIT_LOGIN, window: int = RATE_LIMIT_WINDOW):
+    """Check if request is within rate limit"""
+    now = time()
+    # Clean old entries
+    rate_limit_store[identifier] = [
+        timestamp for timestamp in rate_limit_store[identifier]
+        if now - timestamp < window
+    ]
+    
+    if len(rate_limit_store[identifier]) >= limit:
+        oldest = rate_limit_store[identifier][0]
+        wait_time = int(window - (now - oldest))
+        raise HTTPException(
+            status_code=429,
+            detail=f"Too many requests. Try again in {wait_time} seconds"
+        )
+    
+    rate_limit_store[identifier].append(now)
+
+
 # ===== AUTH ROUTES =====
 @api_router.post("/auth/register")
 async def register(user_data: UserRegister):
