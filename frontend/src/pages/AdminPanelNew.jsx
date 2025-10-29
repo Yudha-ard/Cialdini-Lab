@@ -18,9 +18,12 @@ const AdminPanelNew = () => {
   const { token } = React.useContext(AuthContext);
   const [stats, setStats] = useState(null);
   const [challenges, setChallenges] = useState([]);
+  const [courses, setCourses] = useState([]);
   const [users, setUsers] = useState([]);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
+  const [showCreateCourseDialog, setShowCreateCourseDialog] = useState(false);
   const [editingChallenge, setEditingChallenge] = useState(null);
+  const [editingCourse, setEditingCourse] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
