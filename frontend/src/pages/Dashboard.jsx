@@ -3,10 +3,11 @@ import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext, API } from '@/App';
 import Layout from '@/components/Layout';
 import AchievementSystem from '@/components/AchievementSystem';
+import ActivityHeatmap from '@/components/ActivityHeatmap';
 import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
-import { Trophy, Target, TrendingUp, Zap, Flame, Gift, Calendar } from 'lucide-react';
+import { Trophy, Target, TrendingUp, Zap, Flame, Gift, Calendar, Clock, Award } from 'lucide-react';
 import axios from 'axios';
 
 const Dashboard = () => {
