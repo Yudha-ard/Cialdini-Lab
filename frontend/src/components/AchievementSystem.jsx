@@ -85,21 +85,28 @@ const AchievementSystem = ({ user, completedChallenges = [] }) => {
   ];
 
   useEffect(() => {
-    checkAchievements();
+    if (user && user.id) {
+      checkAchievements();
+    }
   }, [user, completedChallenges]);
 
   const checkAchievements = () => {
+    if (!user || !user.id) return;
+    
     const unlocked = [];
     const newUnlocks = [];
+    
+    // Total challenges available (26 as per our database)
+    const totalChallenges = 26;
 
     allAchievements.forEach(achievement => {
-      const isUnlocked = achievement.requirement(user, completedChallenges.length);
+      const isUnlocked = achievement.requirement(user, totalChallenges);
       
       if (isUnlocked) {
         unlocked.push(achievement);
         
         // Check if this is newly unlocked (not in localStorage)
-        const storageKey = `achievement_${user?.id}_${achievement.id}`;
+        const storageKey = `achievement_${user.id}_${achievement.id}`;
         const wasUnlocked = localStorage.getItem(storageKey);
         
         if (!wasUnlocked) {
