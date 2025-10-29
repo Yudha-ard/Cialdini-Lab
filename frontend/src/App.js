@@ -13,6 +13,9 @@ import ChallengeDetailNew from '@/pages/ChallengeDetailNew';
 import Education from '@/pages/Education';
 import Leaderboard from '@/pages/Leaderboard';
 import AdminPanelNew from '@/pages/AdminPanelNew';
+import Courses from '@/pages/Courses';
+import CourseViewer from '@/pages/CourseViewer';
+import QuizMode from '@/pages/QuizMode';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 export const API = `${BACKEND_URL}/api`;
