@@ -326,6 +326,87 @@ const LandingPage = () => {
         </div>
       </section>
 
+      {/* About Tegalsec Community */}
+      <section className="py-24 bg-zinc-950/50 relative">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto">
+            <div className="text-center mb-16">
+              <h2 className="text-4xl lg:text-5xl font-bold mb-6">
+                Tentang <span className="text-emerald-400">Tegalsec Community</span>
+              </h2>
+              <p className="text-gray-400 text-lg">
+                Komunitas cybersecurity terbesar di Indonesia yang fokus pada edukasi dan awareness
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-8 mb-12">
+              <Card className="glass border-emerald-500/20 p-8">
+                <h3 className="text-2xl font-bold mb-4 text-emerald-400">Misi Kami</h3>
+                <p className="text-gray-300 leading-relaxed">
+                  Meningkatkan kesadaran cybersecurity di Indonesia melalui edukasi praktis dan hands-on learning. 
+                  Kami percaya bahwa setiap orang berhak mendapat akses ke pengetahuan keamanan digital.
+                </p>
+              </Card>
+
+              <Card className="glass border-cyan-500/20 p-8">
+                <h3 className="text-2xl font-bold mb-4 text-cyan-400">Visi Kami</h3>
+                <p className="text-gray-300 leading-relaxed">
+                  Menjadi platform edukasi cybersecurity terdepan di Indonesia yang memberdayakan individu 
+                  dan organisasi untuk melindungi diri dari ancaman digital.
+                </p>
+              </Card>
+            </div>
+
+            <Card className="glass border-zinc-800 p-8">
+              <h3 className="text-2xl font-bold mb-6 text-center">Apa yang Kami Tawarkan</h3>
+              <div className="grid md:grid-cols-3 gap-6">
+                <div className="text-center">
+                  <div className="w-16 h-16 rounded-full bg-emerald-500/10 flex items-center justify-center mx-auto mb-4">
+                    <BookOpen className="w-8 h-8 text-emerald-400" />
+                  </div>
+                  <h4 className="font-semibold mb-2">Workshop & Training</h4>
+                  <p className="text-sm text-gray-400">Pelatihan cybersecurity berkualitas untuk pemula hingga advanced</p>
+                </div>
+                <div className="text-center">
+                  <div className="w-16 h-16 rounded-full bg-cyan-500/10 flex items-center justify-center mx-auto mb-4">
+                    <Users className="w-8 h-8 text-cyan-400" />
+                  </div>
+                  <h4 className="font-semibold mb-2">Community Events</h4>
+                  <p className="text-sm text-gray-400">Meetup, webinar, dan CTF competitions reguler</p>
+                </div>
+                <div className="text-center">
+                  <div className="w-16 h-16 rounded-full bg-purple-500/10 flex items-center justify-center mx-auto mb-4">
+                    <Shield className="w-8 h-8 text-purple-400" />
+                  </div>
+                  <h4 className="font-semibold mb-2">Learning Resources</h4>
+                  <p className="text-sm text-gray-400">Lab praktis, artikel, dan tools untuk belajar mandiri</p>
+                </div>
+              </div>
+            </Card>
+
+            <div className="mt-12 text-center">
+              <p className="text-gray-400 mb-4">Ingin bergabung dengan komunitas?</p>
+              <div className="flex justify-center gap-4">
+                <Button 
+                  variant="outline" 
+                  className="border-emerald-500/50 hover:bg-emerald-500/10"
+                  onClick={() => window.open('https://tegalsec.org', '_blank')}
+                >
+                  Kunjungi Tegalsec.org
+                </Button>
+                <Button 
+                  variant="outline" 
+                  className="border-cyan-500/50 hover:bg-cyan-500/10"
+                  onClick={() => window.open('https://t.me/tegalsec', '_blank')}
+                >
+                  Join Telegram Group
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Footer */}
       <footer className="py-8 border-t border-zinc-800 bg-zinc-950/50">
         <div className="container mx-auto px-4 text-center text-gray-400">
