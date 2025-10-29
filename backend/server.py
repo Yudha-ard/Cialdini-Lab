@@ -524,6 +524,39 @@ async def get_progress(current_user: dict = Depends(get_current_user)):
         "recent_attempts": attempts[-5:] if len(attempts) > 5 else attempts
     }
 
+
+# ===== USER PROFILE =====
+@api_router.put("/user/profile")
+async def update_user_profile(
+    full_name: str,
+    email: str,
+    current_user: dict = Depends(get_current_user)
+):
+    await db.users.update_one(
+        {"id": current_user['id']},
+        {"$set": {"full_name": full_name, "email": email}}
+    )
+    return {"message": "Profile updated successfully"}
+
+@api_router.put("/user/change-password")
+async def change_password(
+    current_password: str,
+    new_password: str,
+    current_user: dict = Depends(get_current_user)
+):
+    # Verify current password
+    if not pwd_context.verify(current_password, current_user['password']):
+        raise HTTPException(status_code=400, detail="Password saat ini salah")
+    
+    # Hash and update new password
+    hashed_password = pwd_context.hash(new_password)
+    await db.users.update_one(
+        {"id": current_user['id']},
+        {"$set": {"password": hashed_password}}
+    )
+    return {"message": "Password changed successfully"}
+
+
 # ===== EDUCATION CONTENT =====
 @api_router.get("/education", response_model=List[EducationContent])
 async def get_education_content(content_type: Optional[str] = None):
