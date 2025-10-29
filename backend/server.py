@@ -211,25 +211,48 @@ async def attempt_challenge(challenge_id: str, answer: dict, current_user: dict 
     if not challenge:
         raise HTTPException(status_code=404, detail="Challenge tidak ditemukan")
     
-    selected = answer.get('selected_answer')
-    is_correct = selected == challenge['correct_answer']
-    points = challenge['points'] if is_correct else 0
+    answers = answer.get('answers', [])
+    time_taken = answer.get('time_taken_seconds', 0)
+    
+    # Calculate correct answers
+    correct_count = 0
+    total_questions = len(challenge['questions'])
+    results = []
+    
+    for idx, (user_ans, question) in enumerate(zip(answers, challenge['questions'])):
+        is_correct = user_ans == question['correct_answer']
+        if is_correct:
+            correct_count += 1
+        results.append({
+            "question_index": idx,
+            "is_correct": is_correct,
+            "explanation": question['explanation']
+        })
+    
+    # Calculate points (partial credit for getting some right)
+    base_points = challenge['points']
+    points_per_question = base_points / total_questions
+    points_earned = int(correct_count * points_per_question)
+    is_completed = correct_count == total_questions
     
     # Save attempt
     attempt = ChallengeAttempt(
         user_id=current_user['id'],
         challenge_id=challenge_id,
-        selected_answer=selected,
-        is_correct=is_correct,
-        points_earned=points
+        answers=answers,
+        correct_count=correct_count,
+        total_questions=total_questions,
+        is_completed=is_completed,
+        points_earned=points_earned,
+        time_taken_seconds=time_taken
     )
     attempt_dict = attempt.model_dump()
     attempt_dict['timestamp'] = attempt_dict['timestamp'].isoformat()
     await db.attempts.insert_one(attempt_dict)
     
-    # Update user progress if correct and not already completed
-    if is_correct and challenge_id not in current_user.get('completed_challenges', []):
-        new_points = current_user.get('points', 0) + points
+    # Update user progress if completed and not already completed
+    if is_completed and challenge_id not in current_user.get('completed_challenges', []):
+        new_points = current_user.get('points', 0) + points_earned
         completed = current_user.get('completed_challenges', [])
         completed.append(challenge_id)
         
@@ -250,9 +273,11 @@ async def attempt_challenge(challenge_id: str, answer: dict, current_user: dict 
         )
     
     return {
-        "is_correct": is_correct,
-        "points_earned": points,
-        "explanation": challenge['explanation'],
+        "correct_count": correct_count,
+        "total_questions": total_questions,
+        "is_completed": is_completed,
+        "points_earned": points_earned,
+        "results": results,
         "tips": challenge['tips']
     }
 
