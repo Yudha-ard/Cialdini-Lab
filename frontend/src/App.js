@@ -12,7 +12,7 @@ import Challenges from '@/pages/Challenges';
 import ChallengeDetailNew from '@/pages/ChallengeDetailNew';
 import Education from '@/pages/Education';
 import Leaderboard from '@/pages/Leaderboard';
-import AdminPanel from '@/pages/AdminPanel';
+import AdminPanelNew from '@/pages/AdminPanelNew';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 export const API = `${BACKEND_URL}/api`;
