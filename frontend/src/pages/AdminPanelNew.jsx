@@ -357,6 +357,101 @@ const AdminPanelNew = () => {
           </TabsContent>
 
 
+          {/* Education Tab */}
+          <TabsContent value='education' className='space-y-4 mt-6'>
+            <div className='flex justify-between items-center mb-4'>
+              <h3 className='text-xl font-semibold'>Manajemen Konten Edukasi</h3>
+              <Dialog open={showCreateEducationDialog} onOpenChange={setShowCreateEducationDialog}>
+                <DialogTrigger asChild>
+                  <Button className='bg-emerald-500 hover:bg-emerald-600'>
+                    <Plus className='w-4 h-4 mr-2' /> Create Edukasi
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className='max-w-2xl max-h-[90vh] overflow-y-auto glass border-zinc-800'>
+                  <DialogHeader>
+                    <DialogTitle>Create Konten Edukasi</DialogTitle>
+                  </DialogHeader>
+                  <EducationForm 
+                    token={token} 
+                    onSuccess={() => { 
+                      setShowCreateEducationDialog(false); 
+                      fetchData(); 
+                    }} 
+                  />
+                </DialogContent>
+              </Dialog>
+            </div>
+            
+            <Card className='glass border-zinc-800 overflow-hidden'>
+              <div className='overflow-x-auto'>
+                <Table>
+                  <TableHeader>
+                    <TableRow className='border-zinc-800'>
+                      <TableHead>Judul</TableHead>
+                      <TableHead>Tipe Konten</TableHead>
+                      <TableHead>Prinsip</TableHead>
+                      <TableHead className='text-right'>Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {education.map((edu) => (
+                      <TableRow key={edu.id} className='border-zinc-800'>
+                        <TableCell className='font-medium'>{edu.title}</TableCell>
+                        <TableCell>
+                          <span className='px-2 py-1 rounded text-xs bg-blue-500/20 text-blue-400'>
+                            {edu.content_type}
+                          </span>
+                        </TableCell>
+                        <TableCell>
+                          <span className='text-sm text-gray-400'>
+                            {edu.principle || '-'}
+                          </span>
+                        </TableCell>
+                        <TableCell className='text-right space-x-2'>
+                          <Button
+                            variant='ghost'
+                            size='sm'
+                            onClick={() => setEditingEducation(edu)}
+                          >
+                            <Edit className='w-4 h-4' />
+                          </Button>
+                          <Button
+                            variant='ghost'
+                            size='sm'
+                            onClick={() => handleDeleteEducation(edu.id)}
+                            className='text-red-400 hover:text-red-300'
+                          >
+                            <Trash2 className='w-4 h-4' />
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            </Card>
+
+            {/* Edit Education Dialog */}
+            {editingEducation && (
+              <Dialog open={!!editingEducation} onOpenChange={() => setEditingEducation(null)}>
+                <DialogContent className='max-w-2xl max-h-[90vh] overflow-y-auto glass border-zinc-800'>
+                  <DialogHeader>
+                    <DialogTitle>Edit Konten Edukasi</DialogTitle>
+                  </DialogHeader>
+                  <EducationForm 
+                    token={token} 
+                    educationData={editingEducation}
+                    onSuccess={() => { 
+                      setEditingEducation(null); 
+                      fetchData(); 
+                    }} 
+                  />
+                </DialogContent>
+              </Dialog>
+            )}
+          </TabsContent>
+
+
           {/* Users Tab */}
           <TabsContent value='users' className='space-y-4 mt-6'>
             <Card className='glass border-zinc-800 overflow-hidden'>
