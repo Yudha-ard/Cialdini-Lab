@@ -214,7 +214,82 @@ async def login(login_data: UserLogin):
 
 @api_router.get("/auth/me")
 async def get_me(current_user: dict = Depends(get_current_user)):
+    # Update streak
+    today = datetime.now(timezone.utc).date().isoformat()
+    last_active = current_user.get('last_active_date')
+    
+    if last_active != today:
+        yesterday = (datetime.now(timezone.utc).date() - timedelta(days=1)).isoformat()
+        if last_active == yesterday:
+            # Continue streak
+            new_streak = current_user.get('streak_days', 0) + 1
+        else:
+            # Reset streak
+            new_streak = 1
+        
+        await db.users.update_one(
+            {"id": current_user['id']},
+            {"$set": {
+                "last_active_date": today,
+                "streak_days": new_streak,
+                "daily_challenge_completed": False
+            }}
+        )
+        current_user['streak_days'] = new_streak
+        current_user['last_active_date'] = today
+        current_user['daily_challenge_completed'] = False
+    
     return current_user
+
+@api_router.post("/auth/forgot-password")
+async def forgot_password(request: ForgotPasswordRequest):
+    user = await db.users.find_one({"email": request.email})
+    if not user:
+        # Don't reveal if email exists (security)
+        return {"message": "Jika email terdaftar, kode reset telah dikirim"}
+    
+    # Generate 6-digit code
+    import random
+    reset_code = str(random.randint(100000, 999999))
+    
+    # Save reset code (expires in 10 minutes)
+    await db.password_resets.insert_one({
+        "email": request.email,
+        "code": reset_code,
+        "expires_at": (datetime.now(timezone.utc) + timedelta(minutes=10)).isoformat(),
+        "created_at": datetime.now(timezone.utc).isoformat()
+    })
+    
+    # In production, send email here. For demo, return code
+    return {"message": "Kode reset telah dikirim ke email", "reset_code": reset_code}
+
+@api_router.post("/auth/reset-password")
+async def reset_password(request: ResetPasswordRequest):
+    # Find valid reset code
+    reset_record = await db.password_resets.find_one({
+        "email": request.email,
+        "code": request.reset_code
+    })
+    
+    if not reset_record:
+        raise HTTPException(status_code=400, detail="Kode reset tidak valid")
+    
+    # Check expiration
+    expires_at = datetime.fromisoformat(reset_record['expires_at'])
+    if datetime.now(timezone.utc) > expires_at:
+        raise HTTPException(status_code=400, detail="Kode reset sudah expired")
+    
+    # Update password
+    hashed = hash_password(request.new_password)
+    await db.users.update_one(
+        {"email": request.email},
+        {"$set": {"password": hashed}}
+    )
+    
+    # Delete used reset code
+    await db.password_resets.delete_one({"_id": reset_record['_id']})
+    
+    return {"message": "Password berhasil direset"}
 
 # ===== CHALLENGE ROUTES =====
 @api_router.get("/challenges", response_model=List[Challenge])
