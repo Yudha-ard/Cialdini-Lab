@@ -9,7 +9,7 @@ import { toast } from 'sonner';
 import LandingPage from '@/pages/LandingPage';
 import Dashboard from '@/pages/Dashboard';
 import Challenges from '@/pages/Challenges';
-import ChallengeDetail from '@/pages/ChallengeDetail';
+import ChallengeDetailNew from '@/pages/ChallengeDetailNew';
 import Education from '@/pages/Education';
 import Leaderboard from '@/pages/Leaderboard';
 import AdminPanel from '@/pages/AdminPanel';
