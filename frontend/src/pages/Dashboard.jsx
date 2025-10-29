@@ -208,6 +208,13 @@ const Dashboard = () => {
           </p>
         </Card>
 
+
+        {/* Achievement System */}
+        <AchievementSystem 
+          user={user} 
+          completedChallenges={user?.completed_challenges || []}
+        />
+
         {/* Quick Actions */}
         <div className="grid md:grid-cols-2 gap-6">
           <Link to="/challenges">
