@@ -466,6 +466,7 @@ const AdminPanelNew = () => {
                       <TableHead>Level</TableHead>
                       <TableHead>Points</TableHead>
                       <TableHead>Completed</TableHead>
+                      <TableHead className='text-right'>Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
