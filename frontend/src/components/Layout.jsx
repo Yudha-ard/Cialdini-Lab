@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { AuthContext } from '@/App';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Home, Target, BookOpen, Trophy, Shield, LogOut, Menu, Settings, Zap } from 'lucide-react';
+import { Home, Target, BookOpen, Trophy, Shield, LogOut, Menu, Settings, Zap, Gamepad2 } from 'lucide-react';
 
 const Layout = ({ children }) => {
   const { user, logout } = React.useContext(AuthContext);
