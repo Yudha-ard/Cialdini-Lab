@@ -613,19 +613,13 @@ async def get_education_content(content_type: Optional[str] = None):
     return contents
 
 @api_router.post("/admin/education")
-async def create_education(content: EducationContent, current_user: dict = Depends(get_current_user)):
-    if current_user.get('role') != 'admin':
-        raise HTTPException(status_code=403, detail="Akses ditolak")
-    
+async def create_education(content: EducationContent, admin_user: dict = Depends(require_admin)):
     content_dict = content.model_dump()
     await db.education.insert_one(content_dict)
     return content
 
 @api_router.put("/admin/education/{content_id}")
-async def update_education(content_id: str, content: EducationContent, current_user: dict = Depends(get_current_user)):
-    if current_user.get('role') != 'admin':
-        raise HTTPException(status_code=403, detail="Akses ditolak")
-    
+async def update_education(content_id: str, content: EducationContent, admin_user: dict = Depends(require_admin)):
     content_dict = content.model_dump()
     result = await db.education.update_one(
         {"id": content_id},
@@ -638,10 +632,7 @@ async def update_education(content_id: str, content: EducationContent, current_u
     return {"message": "Content berhasil diupdate"}
 
 @api_router.delete("/admin/education/{content_id}")
-async def delete_education(content_id: str, current_user: dict = Depends(get_current_user)):
-    if current_user.get('role') != 'admin':
-        raise HTTPException(status_code=403, detail="Akses ditolak")
-    
+async def delete_education(content_id: str, admin_user: dict = Depends(require_admin)):
     result = await db.education.delete_one({"id": content_id})
     
     if result.deleted_count == 0:
