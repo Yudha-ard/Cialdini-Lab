@@ -63,6 +63,21 @@ const AdminPanelNew = () => {
     }
   };
 
+  const handleDeleteCourse = async (courseId) => {
+    if (!confirm('Yakin ingin menghapus course ini?')) return;
+    
+    try {
+      await axios.delete(`${API}/admin/courses/${courseId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      toast.success('Course berhasil dihapus');
+      fetchData();
+    } catch (error) {
+      toast.error('Gagal menghapus course');
+    }
+  };
+
+
   if (loading) {
     return (
       <Layout>
