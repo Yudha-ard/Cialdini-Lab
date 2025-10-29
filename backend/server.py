@@ -143,6 +143,54 @@ class HintRequest(BaseModel):
     hint_cost: int = 10
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
+class CourseSlide(BaseModel):
+    title: str
+    content: str
+    code_example: Optional[str] = None
+    image_url: Optional[str] = None
+
+class CourseModule(BaseModel):
+    module_number: int
+    title: str
+    description: str
+    slides: List[CourseSlide]
+
+class Course(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    title: str
+    description: str
+    category: str
+    difficulty: str
+    modules: List[CourseModule]
+    total_duration_minutes: int
+    prerequisites: List[str] = []
+    learning_outcomes: List[str] = []
+    created_by: str
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class CourseProgress(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str
+    course_id: str
+    completed_modules: List[int] = []
+    current_slide: int = 0
+    completed: bool = False
+    started_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    completed_at: Optional[datetime] = None
+
+class Certificate(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str
+    username: str
+    full_name: str
+    achievement_type: str  # course_completion, all_challenges, expert_level
+    achievement_title: str
+    issued_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    certificate_code: str = Field(default_factory=lambda: str(uuid.uuid4())[:8].upper())
+
 # ===== AUTH HELPERS =====
 def hash_password(password: str) -> str:
     return pwd_context.hash(password)
