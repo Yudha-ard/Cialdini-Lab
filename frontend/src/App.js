@@ -1,53 +1,91 @@
-import { useEffect } from "react";
-import "@/App.css";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import axios from "axios";
+import React, { useState, useEffect } from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import axios from 'axios';
+import '@/App.css';
+import { Toaster } from '@/components/ui/sonner';
+import { toast } from 'sonner';
+
+// Pages
+import LandingPage from '@/pages/LandingPage';
+import Dashboard from '@/pages/Dashboard';
+import Challenges from '@/pages/Challenges';
+import ChallengeDetail from '@/pages/ChallengeDetail';
+import Education from '@/pages/Education';
+import Leaderboard from '@/pages/Leaderboard';
+import AdminPanel from '@/pages/AdminPanel';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
+export const API = `${BACKEND_URL}/api`;
 
-const Home = () => {
-  const helloWorldApi = async () => {
+// Auth Context
+export const AuthContext = React.createContext();
+
+function App() {
+  const [user, setUser] = useState(null);
+  const [token, setToken] = useState(localStorage.getItem('token'));
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (token) {
+      fetchUser();
+    } else {
+      setLoading(false);
+    }
+  }, [token]);
+
+  const fetchUser = async () => {
     try {
-      const response = await axios.get(`${API}/`);
-      console.log(response.data.message);
-    } catch (e) {
-      console.error(e, `errored out requesting / api`);
+      const response = await axios.get(`${API}/auth/me`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setUser(response.data);
+    } catch (error) {
+      console.error('Failed to fetch user:', error);
+      logout();
+    } finally {
+      setLoading(false);
     }
   };
 
-  useEffect(() => {
-    helloWorldApi();
-  }, []);
+  const login = (newToken, userData) => {
+    localStorage.setItem('token', newToken);
+    setToken(newToken);
+    setUser(userData);
+    toast.success('Login berhasil! Selamat datang di Tegalsec Lab.');
+  };
+
+  const logout = () => {
+    localStorage.removeItem('token');
+    setToken(null);
+    setUser(null);
+    toast.info('Anda telah logout.');
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#0a0a0b]">
+        <div className="text-emerald-400 text-xl">Loading...</div>
+      </div>
+    );
+  }
 
   return (
-    <div>
-      <header className="App-header">
-        <a
-          className="App-link"
-          href="https://emergent.sh"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <img src="https://avatars.githubusercontent.com/in/1201222?s=120&u=2686cf91179bbafbc7a71bfbc43004cf9ae1acea&v=4" />
-        </a>
-        <p className="mt-5">Building something incredible ~!</p>
-      </header>
-    </div>
-  );
-};
-
-function App() {
-  return (
-    <div className="App">
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Home />}>
-            <Route index element={<Home />} />
-          </Route>
-        </Routes>
-      </BrowserRouter>
-    </div>
+    <AuthContext.Provider value={{ user, token, login, logout, refreshUser: fetchUser }}>
+      <div className="App">
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={!user ? <LandingPage /> : <Navigate to="/dashboard" />} />
+            <Route path="/dashboard" element={user ? <Dashboard /> : <Navigate to="/" />} />
+            <Route path="/challenges" element={user ? <Challenges /> : <Navigate to="/" />} />
+            <Route path="/challenges/:id" element={user ? <ChallengeDetail /> : <Navigate to="/" />} />
+            <Route path="/education" element={user ? <Education /> : <Navigate to="/" />} />
+            <Route path="/leaderboard" element={user ? <Leaderboard /> : <Navigate to="/" />} />
+            <Route path="/admin" element={user?.role === 'admin' ? <AdminPanel /> : <Navigate to="/dashboard" />} />
+          </Routes>
+        </BrowserRouter>
+        <Toaster position="top-right" richColors />
+      </div>
+    </AuthContext.Provider>
   );
 }
 
