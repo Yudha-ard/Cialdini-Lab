@@ -18,6 +18,7 @@ const Layout = ({ children }) => {
     { name: 'Quiz Mode', path: '/quiz', icon: <Zap className="w-5 h-5" /> },
     { name: 'Edukasi', path: '/education', icon: <BookOpen className="w-5 h-5" /> },
     { name: 'Leaderboard', path: '/leaderboard', icon: <Trophy className="w-5 h-5" /> },
+    { name: 'Profile', path: '/profile', icon: <User className="w-5 h-5" /> },
   ];
 
   if (user?.role === 'admin') {
