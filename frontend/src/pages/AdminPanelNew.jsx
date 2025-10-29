@@ -527,6 +527,26 @@ const AdminPanelNew = () => {
             </Card>
           </TabsContent>
 
+            {/* Edit User Dialog */}
+            {editingUser && (
+              <Dialog open={!!editingUser} onOpenChange={() => setEditingUser(null)}>
+                <DialogContent className='max-w-md glass border-zinc-800'>
+                  <DialogHeader>
+                    <DialogTitle>Edit User</DialogTitle>
+                  </DialogHeader>
+                  <UserEditForm 
+                    token={token} 
+                    userData={editingUser}
+                    onSuccess={() => { 
+                      setEditingUser(null); 
+                      fetchData(); 
+                    }} 
+                  />
+                </DialogContent>
+              </Dialog>
+            )}
+
+
           {/* Activity Tab */}
           <TabsContent value='activity' className='space-y-6 mt-6'>
             <Card className='glass border-zinc-800 p-6'>
