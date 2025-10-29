@@ -108,6 +108,30 @@ class EducationContent(BaseModel):
     content: str
     principle: Optional[str] = None
 
+class Badge(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str
+    name: str
+    description: str
+    icon: str
+    requirement: str
+
+class UserBadge(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str
+    badge_id: str
+    earned_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class HintRequest(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str
+    challenge_id: str
+    question_index: int
+    hint_cost: int = 10
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
 # ===== AUTH HELPERS =====
 def hash_password(password: str) -> str:
     return pwd_context.hash(password)
