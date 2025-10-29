@@ -82,6 +82,9 @@ function App() {
             <Route path="/challenges" element={user ? <Challenges /> : <Navigate to="/" />} />
             <Route path="/challenges/:id" element={user ? <ChallengeDetailNew /> : <Navigate to="/" />} />
             <Route path="/education" element={user ? <Education /> : <Navigate to="/" />} />
+            <Route path="/courses" element={user ? <Courses /> : <Navigate to="/" />} />
+            <Route path="/courses/:id" element={user ? <CourseViewer /> : <Navigate to="/" />} />
+            <Route path="/quiz" element={user ? <QuizMode /> : <Navigate to="/" />} />
             <Route path="/leaderboard" element={user ? <Leaderboard /> : <Navigate to="/" />} />
             <Route path="/admin" element={user?.role === 'admin' ? <AdminPanelNew /> : <Navigate to="/dashboard" />} />
           </Routes>
