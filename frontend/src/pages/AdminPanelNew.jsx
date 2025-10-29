@@ -94,6 +94,21 @@ const AdminPanelNew = () => {
       fetchData();
     } catch (error) {
       toast.error('Gagal menghapus konten edukasi');
+
+  const handleDeleteUser = async (userId) => {
+    if (!confirm('Yakin ingin menghapus user ini?')) return;
+    
+    try {
+      await axios.delete(`${API}/admin/users/${userId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      toast.success('User berhasil dihapus');
+      fetchData();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Gagal menghapus user');
+    }
+  };
+
     }
   };
 
