@@ -35,15 +35,17 @@ const AdminPanelNew = () => {
 
   const fetchData = async () => {
     try {
-      const [statsRes, challengesRes, coursesRes, usersRes] = await Promise.all([
+      const [statsRes, challengesRes, coursesRes, educationRes, usersRes] = await Promise.all([
         axios.get(`${API}/admin/stats`, { headers: { Authorization: `Bearer ${token}` } }),
         axios.get(`${API}/challenges`),
         axios.get(`${API}/courses`),
+        axios.get(`${API}/education`),
         axios.get(`${API}/admin/users`, { headers: { Authorization: `Bearer ${token}` } })
       ]);
       setStats(statsRes.data);
       setChallenges(challengesRes.data);
       setCourses(coursesRes.data);
+      setEducation(educationRes.data);
       setUsers(usersRes.data);
     } catch (error) {
       toast.error('Gagal load data admin');
