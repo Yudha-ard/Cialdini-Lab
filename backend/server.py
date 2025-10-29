@@ -1,15 +1,17 @@
-from fastapi import FastAPI, APIRouter
+from fastapi import FastAPI, APIRouter, HTTPException, Depends, status
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 import os
 import logging
 from pathlib import Path
-from pydantic import BaseModel, Field, ConfigDict
-from typing import List
+from pydantic import BaseModel, Field, ConfigDict, EmailStr
+from typing import List, Optional
 import uuid
-from datetime import datetime, timezone
-
+from datetime import datetime, timezone, timedelta
+from passlib.context import CryptContext
+import jwt
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -19,54 +21,279 @@ mongo_url = os.environ['MONGO_URL']
 client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ['DB_NAME']]
 
-# Create the main app without a prefix
-app = FastAPI()
+# Security
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+security = HTTPBearer()
+SECRET_KEY = os.environ.get('JWT_SECRET', 'tegalsec-secret-key-2025')
+ALGORITHM = "HS256"
 
-# Create a router with the /api prefix
+app = FastAPI()
 api_router = APIRouter(prefix="/api")
 
+# ===== MODELS =====
+class UserRegister(BaseModel):
+    username: str
+    email: EmailStr
+    password: str
+    full_name: str
 
-# Define Models
-class StatusCheck(BaseModel):
-    model_config = ConfigDict(extra="ignore")  # Ignore MongoDB's _id field
-    
+class UserLogin(BaseModel):
+    username: str
+    password: str
+
+class User(BaseModel):
+    model_config = ConfigDict(extra="ignore")
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    client_name: str
+    username: str
+    email: str
+    full_name: str
+    role: str = "user"  # user or admin
+    points: int = 0
+    level: str = "Beginner"
+    completed_challenges: List[str] = []
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class Challenge(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    title: str
+    category: str  # phishing, pretexting, baiting, quid_pro_quo, tailgating, money_app, indonesian_case
+    difficulty: str  # beginner, intermediate, advanced
+    cialdini_principle: str  # reciprocity, commitment, social_proof, authority, liking, scarcity
+    description: str
+    scenario: str
+    question: str
+    options: List[str]
+    correct_answer: int
+    explanation: str
+    points: int
+    tips: List[str]
+    real_case_reference: Optional[str] = None
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class ChallengeAttempt(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str
+    challenge_id: str
+    selected_answer: int
+    is_correct: bool
+    points_earned: int
     timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
-class StatusCheckCreate(BaseModel):
-    client_name: str
+class EducationContent(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    title: str
+    content_type: str  # cialdini_principle, prevention_tips, case_study
+    content: str
+    principle: Optional[str] = None
 
-# Add your routes to the router instead of directly to app
-@api_router.get("/")
-async def root():
-    return {"message": "Hello World"}
+# ===== AUTH HELPERS =====
+def hash_password(password: str) -> str:
+    return pwd_context.hash(password)
 
-@api_router.post("/status", response_model=StatusCheck)
-async def create_status_check(input: StatusCheckCreate):
-    status_dict = input.model_dump()
-    status_obj = StatusCheck(**status_dict)
-    
-    # Convert to dict and serialize datetime to ISO string for MongoDB
-    doc = status_obj.model_dump()
-    doc['timestamp'] = doc['timestamp'].isoformat()
-    
-    _ = await db.status_checks.insert_one(doc)
-    return status_obj
+def verify_password(plain_password: str, hashed_password: str) -> bool:
+    return pwd_context.verify(plain_password, hashed_password)
 
-@api_router.get("/status", response_model=List[StatusCheck])
-async def get_status_checks():
-    # Exclude MongoDB's _id field from the query results
-    status_checks = await db.status_checks.find({}, {"_id": 0}).to_list(1000)
-    
-    # Convert ISO string timestamps back to datetime objects
-    for check in status_checks:
-        if isinstance(check['timestamp'], str):
-            check['timestamp'] = datetime.fromisoformat(check['timestamp'])
-    
-    return status_checks
+def create_access_token(data: dict) -> str:
+    to_encode = data.copy()
+    expire = datetime.now(timezone.utc) + timedelta(days=7)
+    to_encode.update({"exp": expire})
+    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
-# Include the router in the main app
+async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
+    try:
+        token = credentials.credentials
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        user_id = payload.get("sub")
+        if user_id is None:
+            raise HTTPException(status_code=401, detail="Invalid token")
+        
+        user = await db.users.find_one({"id": user_id}, {"_id": 0})
+        if not user:
+            raise HTTPException(status_code=401, detail="User not found")
+        return user
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(status_code=401, detail="Token expired")
+    except Exception:
+        raise HTTPException(status_code=401, detail="Invalid token")
+
+# ===== AUTH ROUTES =====
+@api_router.post("/auth/register")
+async def register(user_data: UserRegister):
+    # Check if username exists
+    existing = await db.users.find_one({"username": user_data.username})
+    if existing:
+        raise HTTPException(status_code=400, detail="Username sudah digunakan")
+    
+    # Check if email exists
+    existing_email = await db.users.find_one({"email": user_data.email})
+    if existing_email:
+        raise HTTPException(status_code=400, detail="Email sudah terdaftar")
+    
+    # Create user
+    user = User(
+        username=user_data.username,
+        email=user_data.email,
+        full_name=user_data.full_name
+    )
+    
+    user_dict = user.model_dump()
+    user_dict['password'] = hash_password(user_data.password)
+    user_dict['created_at'] = user_dict['created_at'].isoformat()
+    
+    await db.users.insert_one(user_dict)
+    
+    token = create_access_token({"sub": user.id})
+    return {"token": token, "user": user.model_dump()}
+
+@api_router.post("/auth/login")
+async def login(login_data: UserLogin):
+    user = await db.users.find_one({"username": login_data.username}, {"_id": 0})
+    if not user or not verify_password(login_data.password, user['password']):
+        raise HTTPException(status_code=401, detail="Username atau password salah")
+    
+    token = create_access_token({"sub": user['id']})
+    user.pop('password')
+    return {"token": token, "user": user}
+
+@api_router.get("/auth/me")
+async def get_me(current_user: dict = Depends(get_current_user)):
+    return current_user
+
+# ===== CHALLENGE ROUTES =====
+@api_router.get("/challenges", response_model=List[Challenge])
+async def get_challenges(category: Optional[str] = None, difficulty: Optional[str] = None):
+    query = {}
+    if category:
+        query['category'] = category
+    if difficulty:
+        query['difficulty'] = difficulty
+    
+    challenges = await db.challenges.find(query, {"_id": 0}).to_list(1000)
+    for ch in challenges:
+        if isinstance(ch['created_at'], str):
+            ch['created_at'] = datetime.fromisoformat(ch['created_at'])
+    return challenges
+
+@api_router.get("/challenges/{challenge_id}")
+async def get_challenge(challenge_id: str):
+    challenge = await db.challenges.find_one({"id": challenge_id}, {"_id": 0})
+    if not challenge:
+        raise HTTPException(status_code=404, detail="Challenge tidak ditemukan")
+    if isinstance(challenge['created_at'], str):
+        challenge['created_at'] = datetime.fromisoformat(challenge['created_at'])
+    return challenge
+
+@api_router.post("/challenges/{challenge_id}/attempt")
+async def attempt_challenge(challenge_id: str, answer: dict, current_user: dict = Depends(get_current_user)):
+    challenge = await db.challenges.find_one({"id": challenge_id}, {"_id": 0})
+    if not challenge:
+        raise HTTPException(status_code=404, detail="Challenge tidak ditemukan")
+    
+    selected = answer.get('selected_answer')
+    is_correct = selected == challenge['correct_answer']
+    points = challenge['points'] if is_correct else 0
+    
+    # Save attempt
+    attempt = ChallengeAttempt(
+        user_id=current_user['id'],
+        challenge_id=challenge_id,
+        selected_answer=selected,
+        is_correct=is_correct,
+        points_earned=points
+    )
+    attempt_dict = attempt.model_dump()
+    attempt_dict['timestamp'] = attempt_dict['timestamp'].isoformat()
+    await db.attempts.insert_one(attempt_dict)
+    
+    # Update user progress if correct and not already completed
+    if is_correct and challenge_id not in current_user.get('completed_challenges', []):
+        new_points = current_user.get('points', 0) + points
+        completed = current_user.get('completed_challenges', [])
+        completed.append(challenge_id)
+        
+        # Update level based on points
+        level = "Beginner"
+        if new_points >= 500:
+            level = "Advanced"
+        elif new_points >= 200:
+            level = "Intermediate"
+        
+        await db.users.update_one(
+            {"id": current_user['id']},
+            {"$set": {
+                "points": new_points,
+                "completed_challenges": completed,
+                "level": level
+            }}
+        )
+    
+    return {
+        "is_correct": is_correct,
+        "points_earned": points,
+        "explanation": challenge['explanation'],
+        "tips": challenge['tips']
+    }
+
+# ===== LEADERBOARD =====
+@api_router.get("/leaderboard")
+async def get_leaderboard():
+    users = await db.users.find({}, {"_id": 0, "password": 0}).to_list(1000)
+    sorted_users = sorted(users, key=lambda x: x.get('points', 0), reverse=True)[:10]
+    return sorted_users
+
+# ===== USER PROGRESS =====
+@api_router.get("/progress")
+async def get_progress(current_user: dict = Depends(get_current_user)):
+    total_challenges = await db.challenges.count_documents({})
+    completed = len(current_user.get('completed_challenges', []))
+    attempts = await db.attempts.find({"user_id": current_user['id']}, {"_id": 0}).to_list(1000)
+    
+    return {
+        "total_challenges": total_challenges,
+        "completed_challenges": completed,
+        "points": current_user.get('points', 0),
+        "level": current_user.get('level', 'Beginner'),
+        "recent_attempts": attempts[-5:] if len(attempts) > 5 else attempts
+    }
+
+# ===== EDUCATION CONTENT =====
+@api_router.get("/education", response_model=List[EducationContent])
+async def get_education_content(content_type: Optional[str] = None):
+    query = {}
+    if content_type:
+        query['content_type'] = content_type
+    contents = await db.education.find(query, {"_id": 0}).to_list(1000)
+    return contents
+
+# ===== ADMIN ROUTES =====
+@api_router.post("/admin/challenges")
+async def create_challenge(challenge: Challenge, current_user: dict = Depends(get_current_user)):
+    if current_user.get('role') != 'admin':
+        raise HTTPException(status_code=403, detail="Akses ditolak")
+    
+    challenge_dict = challenge.model_dump()
+    challenge_dict['created_at'] = challenge_dict['created_at'].isoformat()
+    await db.challenges.insert_one(challenge_dict)
+    return challenge
+
+@api_router.get("/admin/stats")
+async def get_admin_stats(current_user: dict = Depends(get_current_user)):
+    if current_user.get('role') != 'admin':
+        raise HTTPException(status_code=403, detail="Akses ditolak")
+    
+    total_users = await db.users.count_documents({})
+    total_challenges = await db.challenges.count_documents({})
+    total_attempts = await db.attempts.count_documents({})
+    
+    return {
+        "total_users": total_users,
+        "total_challenges": total_challenges,
+        "total_attempts": total_attempts
+    }
+
 app.include_router(api_router)
 
 app.add_middleware(
@@ -77,7 +304,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Configure logging
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
