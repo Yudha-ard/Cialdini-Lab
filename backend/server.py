@@ -514,18 +514,6 @@ async def get_user_badges(current_user: dict = Depends(get_current_user)):
         earned_badges.append("perfectionist")
     
     return {"earned_badges": earned_badges}
-    if current_user.get('role') != 'admin':
-        raise HTTPException(status_code=403, detail="Akses ditolak")
-    
-    total_users = await db.users.count_documents({})
-    total_challenges = await db.challenges.count_documents({})
-    total_attempts = await db.attempts.count_documents({})
-    
-    return {
-        "total_users": total_users,
-        "total_challenges": total_challenges,
-        "total_attempts": total_attempts
-    }
 
 app.include_router(api_router)
 
