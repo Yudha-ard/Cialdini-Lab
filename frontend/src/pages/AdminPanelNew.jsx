@@ -597,10 +597,9 @@ const AdminPanelNew = () => {
         </Tabs>
       </div>
 
-      {/* Edit Dialog */}
-      {editingChallenge && (
-        <Dialog open={!!editingChallenge} onOpenChange={() => setEditingChallenge(null)}>
-          <DialogContent className='max-w-4xl max-h-[90vh] overflow-y-auto bg-zinc-950 border-zinc-800'>
+    </Layout>
+  );
+};
 
 // User Edit Form Component
 const UserEditForm = ({ token, userData, onSuccess }) => {
