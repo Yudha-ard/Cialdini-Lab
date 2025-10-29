@@ -13,6 +13,8 @@ const Layout = ({ children }) => {
   const navigation = [
     { name: 'Dashboard', path: '/dashboard', icon: <Home className="w-5 h-5" /> },
     { name: 'Challenges', path: '/challenges', icon: <Target className="w-5 h-5" /> },
+    { name: 'Courses', path: '/courses', icon: <BookOpen className="w-5 h-5" /> },
+    { name: 'Quiz Mode', path: '/quiz', icon: <Zap className="w-5 h-5" /> },
     { name: 'Edukasi', path: '/education', icon: <BookOpen className="w-5 h-5" /> },
     { name: 'Leaderboard', path: '/leaderboard', icon: <Trophy className="w-5 h-5" /> },
   ];
