@@ -82,6 +82,21 @@ const AdminPanelNew = () => {
     }
   };
 
+  const handleDeleteEducation = async (educationId) => {
+    if (!confirm('Yakin ingin menghapus konten edukasi ini?')) return;
+    
+    try {
+      await axios.delete(`${API}/admin/education/${educationId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      toast.success('Konten edukasi berhasil dihapus');
+      fetchData();
+    } catch (error) {
+      toast.error('Gagal menghapus konten edukasi');
+    }
+  };
+
+
 
   if (loading) {
     return (
