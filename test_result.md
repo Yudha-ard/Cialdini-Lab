@@ -101,3 +101,224 @@
 #====================================================================================================
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
+
+user_problem_statement: |
+  User meminta fitur Course CRUD untuk Admin dengan kemampuan menambahkan module sesuai course yang ada.
+  Fitur ini harus terintegrasi di AdminPanel dengan tab khusus untuk manajemen Course.
+
+backend:
+  - task: "Course CRUD API endpoints"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: |
+          Backend Course CRUD endpoints sudah ada sebelumnya:
+          - POST /api/admin/courses - Create course
+          - PUT /api/admin/courses/{course_id} - Update course
+          - DELETE /api/admin/courses/{course_id} - Delete course
+          - GET /api/courses - Get all courses
+          - GET /api/courses/{course_id} - Get single course
+          
+          Models sudah mendukung Course, CourseModule, dan CourseSlide dengan struktur lengkap.
+          Perlu testing untuk memastikan semua endpoint bekerja dengan benar, terutama untuk:
+          1. Create course dengan modules dan slides
+          2. Update course dengan perubahan modules
+          3. Delete course
+          4. Fetch courses list
+
+frontend:
+  - task: "AdminPanel Course Tab dan CRUD UI"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/AdminPanelNew.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: |
+          Menambahkan fitur Course CRUD di AdminPanelNew.jsx:
+          1. ✅ Menambahkan state: courses, showCreateCourseDialog, editingCourse
+          2. ✅ Update fetchData() untuk fetch courses dari /api/courses
+          3. ✅ Menambahkan tab "Courses" di TabsList (mengubah grid dari 3 ke 4 kolom)
+          4. ✅ Membuat TabsContent untuk Courses dengan:
+             - Tabel list courses (judul, kategori, tingkat, jumlah modules, durasi)
+             - Action buttons: Edit & Delete
+             - Create Course button dengan dialog
+          5. ✅ Membuat CourseForm component dengan fitur lengkap:
+             - Basic info: title, description, category, difficulty, total_duration_minutes
+             - Prerequisites management (add/remove)
+             - Learning outcomes management (add/remove)
+             - Modules management dengan nested structure:
+               * Setiap module punya: module_number, title, description, slides[]
+               * Add/remove module functionality
+               * Setiap module bisa add/remove slides
+             - Slides management:
+               * Setiap slide punya: title, content, code_example, image_url
+               * Dynamic add/remove per module
+          6. ✅ Form support untuk Create dan Edit mode
+          7. ✅ handleDeleteCourse function dengan konfirmasi
+          
+          Perlu testing UI untuk memastikan:
+          - Tab Courses muncul dan navigasi berfungsi
+          - Form Create Course bisa add modules dan slides
+          - Edit Course memuat data dengan benar
+          - Delete Course berfungsi dengan konfirmasi
+
+  - task: "Dark Pattern Detector"
+    implemented: true
+    working: "NA"
+    file: "various"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Fitur Kejutan sudah diimplementasi sebelumnya, perlu verifikasi"
+
+  - task: "Personal Analytics"
+    implemented: true
+    working: "NA"
+    file: "various"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Fitur Kejutan sudah diimplementasi sebelumnya, perlu verifikasi"
+
+  - task: "Badge Showcase"
+    implemented: true
+    working: "NA"
+    file: "various"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Fitur Kejutan sudah diimplementasi sebelumnya, perlu verifikasi"
+
+  - task: "Cialdini Challenges"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/seed_cialdini_categories.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Challenges berdasarkan 6 prinsip Cialdini sudah di-seed, perlu verifikasi data"
+
+  - task: "CourseViewer component"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/CourseViewer.jsx"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "CourseViewer telah dibuat ulang untuk fix syntax errors, perlu testing"
+
+metadata:
+  created_by: "main_agent"
+  version: "1.0"
+  test_sequence: 1
+  run_ui: false
+
+test_plan:
+  current_focus:
+    - "Course CRUD API endpoints"
+    - "AdminPanel Course Tab dan CRUD UI"
+  stuck_tasks: []
+  test_all: false
+  test_priority: "high_first"
+
+agent_communication:
+  - agent: "main"
+    message: |
+      IMPLEMENTASI COURSE CRUD SELESAI - SIAP UNTUK BACKEND TESTING
+      
+      Saya telah mengimplementasikan fitur Course CRUD di AdminPanel:
+      
+      BACKEND (Already exists):
+      - Course model dengan modules dan slides structure
+      - API endpoints untuk CRUD operations
+      - Admin authorization untuk create/update/delete
+      
+      FRONTEND (Newly implemented):
+      - Tab "Courses" baru di AdminPanel
+      - CourseForm component dengan nested structure untuk modules dan slides
+      - Full CRUD UI dengan create, edit, delete functionality
+      - Dynamic add/remove untuk prerequisites, learning outcomes, modules, dan slides
+      
+      REQUEST FOR BACKEND TESTING:
+      Mohon test backend API endpoints untuk Course CRUD:
+      
+      1. Test Credentials:
+         - Admin user: username=admin, password=admin123
+         - Backend URL: https://secsim-lab.preview.emergentagent.com/api
+      
+      2. Test Scenarios (PRIORITY HIGH):
+         a. GET /api/courses - Fetch all courses
+         b. POST /api/admin/courses - Create new course dengan modules & slides
+            Sample payload:
+            {
+              "title": "Test Course Social Engineering",
+              "description": "Course untuk testing CRUD",
+              "category": "social_engineering",
+              "difficulty": "beginner",
+              "total_duration_minutes": 60,
+              "prerequisites": ["Basic Security Knowledge"],
+              "learning_outcomes": ["Understand SE basics", "Identify threats"],
+              "modules": [{
+                "module_number": 1,
+                "title": "Introduction",
+                "description": "Intro module",
+                "slides": [{
+                  "title": "Welcome",
+                  "content": "Welcome to the course",
+                  "code_example": "",
+                  "image_url": ""
+                }]
+              }],
+              "created_by": "admin"
+            }
+         c. PUT /api/admin/courses/{course_id} - Update existing course
+         d. DELETE /api/admin/courses/{course_id} - Delete course
+         e. GET /api/courses/{course_id} - Get single course detail
+      
+      3. Edge Cases to Test:
+         - Create course tanpa modules (empty array)
+         - Create course dengan multiple modules (2-3 modules)
+         - Update course - add new module
+         - Update course - remove existing module
+         - Delete course yang tidak exist (404 expected)
+         - Authorization - test tanpa token (403 expected)
+      
+      4. Validation to Check:
+         - Required fields (title, description, category, difficulty)
+         - Module numbering consistency
+         - Created_by field population
+         - DateTime serialization
+      
+      SETELAH BACKEND TESTING:
+      - Jika backend OK, akan dilanjutkan dengan frontend E2E testing
+      - Jika ada issue, akan diperbaiki terlebih dahulu
+      
+      Status aplikasi saat ini:
+      - Frontend: Compiled successfully
+      - Backend: Running
+      - Login page: Accessible
