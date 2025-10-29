@@ -13,6 +13,7 @@ import { toast } from 'sonner';
 const LandingPage = () => {
   const { login } = React.useContext(AuthContext);
   const [showAuth, setShowAuth] = useState(false);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
