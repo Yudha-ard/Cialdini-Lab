@@ -194,9 +194,23 @@ const LandingPage = () => {
               >
                 Kembali ke Landing Page
               </Button>
+              {isLogin && (
+                <Button 
+                  variant="ghost" 
+                  className="text-emerald-400 hover:text-emerald-300 ml-4"
+                  onClick={() => setShowForgotPassword(true)}
+                >
+                  Lupa Password?
+                </Button>
+              )}
             </div>
           </Card>
         </div>
+        
+        <ForgotPassword 
+          open={showForgotPassword} 
+          onClose={() => setShowForgotPassword(false)} 
+        />
       </div>
     );
   }
