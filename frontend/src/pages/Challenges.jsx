@@ -6,7 +6,8 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Shield, Lock, FileText, Gift, Users, Smartphone, TrendingUp, ChevronRight } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Shield, Lock, FileText, Gift, Users, Smartphone, TrendingUp, ChevronRight, Heart, Handshake, Star, Crown, Zap, Clock } from 'lucide-react';
 import axios from 'axios';
 
 const Challenges = () => {
