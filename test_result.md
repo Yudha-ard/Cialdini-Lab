@@ -109,11 +109,11 @@ user_problem_statement: |
 backend:
   - task: "Course CRUD API endpoints"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
@@ -131,6 +131,45 @@ backend:
           2. Update course dengan perubahan modules
           3. Delete course
           4. Fetch courses list
+      - working: true
+        agent: "testing"
+        comment: |
+          BACKEND TESTING COMPLETED - ALL COURSE CRUD ENDPOINTS WORKING
+          
+          ✅ AUTHENTICATION: Admin login successful with proper token and role validation
+          ✅ GET /api/courses: Successfully retrieves all courses with proper structure validation
+          ✅ POST /api/admin/courses: Creates courses with complete nested structure (modules & slides)
+          ✅ GET /api/courses/{id}: Retrieves single course with full module and slide data
+          ✅ PUT /api/admin/courses/{id}: Updates courses including adding/modifying modules
+          ✅ DELETE /api/admin/courses/{id}: Properly deletes courses and returns 404 on subsequent access
+          
+          EDGE CASES TESTED:
+          ✅ Empty modules array - Accepted and handled correctly
+          ✅ Multiple modules (3-4) with multiple slides - Full structure preserved
+          ✅ Unauthorized access protection - Returns 403 without valid admin token
+          ✅ Non-existent course handling - Returns 404 appropriately
+          
+          VALIDATION VERIFIED:
+          ✅ Required fields present in all responses (id, title, description, category, difficulty)
+          ✅ Module numbering consistency maintained
+          ✅ DateTime fields properly serialized
+          ✅ created_by field populated correctly
+          ✅ Course ID preservation during updates
+          
+          ISSUE FOUND & FIXED:
+          - Fixed critical bug in PUT /api/admin/courses/{id} where course ID was being overwritten
+          - Added logic to exclude 'id' field from update payload to preserve original course ID
+          
+          COMPREHENSIVE TEST RESULTS:
+          - Authentication: ✅ PASS
+          - Create Course: ✅ PASS (with complex nested structure)
+          - Read Single Course: ✅ PASS
+          - Update Course: ✅ PASS (including module additions)
+          - Delete Course: ✅ PASS
+          - List All Courses: ✅ PASS
+          - Edge Cases: ✅ PASS (empty modules, unauthorized access, non-existent course)
+          
+          All Course CRUD API endpoints are fully functional and ready for production use.
 
 frontend:
   - task: "AdminPanel Course Tab dan CRUD UI"
