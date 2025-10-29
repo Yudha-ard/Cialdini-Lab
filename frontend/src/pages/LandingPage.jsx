@@ -275,16 +275,16 @@ const LandingPage = () => {
 
             <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-8">
               <div className="text-center">
-                <div className="text-3xl font-bold text-emerald-400 mb-2">8+</div>
+                <div className="text-3xl font-bold text-emerald-400 mb-2">26+</div>
                 <div className="text-sm text-gray-400">Challenges</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold text-emerald-400 mb-2">6</div>
-                <div className="text-sm text-gray-400">Prinsip Cialdini</div>
+                <div className="text-3xl font-bold text-emerald-400 mb-2">150+</div>
+                <div className="text-sm text-gray-400">Questions</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold text-emerald-400 mb-2">100%</div>
-                <div className="text-sm text-gray-400">Kasus Lokal</div>
+                <div className="text-3xl font-bold text-emerald-400 mb-2">8</div>
+                <div className="text-sm text-gray-400">Achievements</div>
               </div>
               <div className="text-center">
                 <div className="text-3xl font-bold text-emerald-400 mb-2">Gratis</div>
