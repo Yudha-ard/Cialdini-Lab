@@ -470,21 +470,39 @@ const AdminPanelNew = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {users.map((user) => (
-                      <TableRow key={user.id} className='border-zinc-800'>
-                        <TableCell className='font-medium'>@{user.username}</TableCell>
-                        <TableCell>{user.full_name}</TableCell>
-                        <TableCell>{user.email}</TableCell>
+                    {users.map((currentUserRow) => (
+                      <TableRow key={currentUserRow.id} className='border-zinc-800'>
+                        <TableCell className='font-medium'>@{currentUserRow.username}</TableCell>
+                        <TableCell>{currentUserRow.full_name}</TableCell>
+                        <TableCell>{currentUserRow.email}</TableCell>
                         <TableCell>
                           <span className={`px-2 py-1 rounded text-xs ${
-                            user.role === 'admin' ? 'bg-red-500/20 text-red-400' : 'bg-blue-500/20 text-blue-400'
+                            currentUserRow.role === 'admin' ? 'bg-red-500/20 text-red-400' : 'bg-blue-500/20 text-blue-400'
                           }`}>
-                            {user.role}
+                            {currentUserRow.role}
                           </span>
                         </TableCell>
-                        <TableCell>{user.level}</TableCell>
-                        <TableCell className='text-emerald-400 font-semibold'>{user.points}</TableCell>
-                        <TableCell>{user.completed_challenges?.length || 0}</TableCell>
+                        <TableCell>{currentUserRow.level}</TableCell>
+                        <TableCell className='text-emerald-400 font-semibold'>{currentUserRow.points}</TableCell>
+                        <TableCell>{currentUserRow.completed_challenges?.length || 0}</TableCell>
+                        <TableCell className='text-right space-x-2'>
+                          <Button
+                            variant='ghost'
+                            size='sm'
+                            onClick={() => setEditingUser(currentUserRow)}
+                          >
+                            <Edit className='w-4 h-4' />
+                          </Button>
+                          <Button
+                            variant='ghost'
+                            size='sm'
+                            onClick={() => handleDeleteUser(currentUserRow.id)}
+                            className='text-red-400 hover:text-red-300'
+                            disabled={currentUserRow.role === 'admin'}
+                          >
+                            <Trash2 className='w-4 h-4' />
+                          </Button>
+                        </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
