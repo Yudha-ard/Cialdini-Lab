@@ -80,7 +80,7 @@ function App() {
             <Route path="/challenges/:id" element={user ? <ChallengeDetailNew /> : <Navigate to="/" />} />
             <Route path="/education" element={user ? <Education /> : <Navigate to="/" />} />
             <Route path="/leaderboard" element={user ? <Leaderboard /> : <Navigate to="/" />} />
-            <Route path="/admin" element={user?.role === 'admin' ? <AdminPanel /> : <Navigate to="/dashboard" />} />
+            <Route path="/admin" element={user?.role === 'admin' ? <AdminPanelNew /> : <Navigate to="/dashboard" />} />
           </Routes>
         </BrowserRouter>
         <Toaster position="top-right" richColors />
