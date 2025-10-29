@@ -27,6 +27,7 @@ const AdminPanelNew = () => {
   const [editingChallenge, setEditingChallenge] = useState(null);
   const [editingCourse, setEditingCourse] = useState(null);
   const [editingEducation, setEditingEducation] = useState(null);
+  const [editingUser, setEditingUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
