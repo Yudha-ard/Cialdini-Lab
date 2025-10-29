@@ -233,6 +233,109 @@ const AdminPanelNew = () => {
             </Card>
           </TabsContent>
 
+          {/* Courses Tab */}
+          <TabsContent value='courses' className='space-y-4 mt-6'>
+            <div className='flex justify-between items-center mb-4'>
+              <h3 className='text-xl font-semibold'>Manajemen Course</h3>
+              <Dialog open={showCreateCourseDialog} onOpenChange={setShowCreateCourseDialog}>
+                <DialogTrigger asChild>
+                  <Button className='bg-emerald-500 hover:bg-emerald-600'>
+                    <Plus className='w-4 h-4 mr-2' /> Create Course
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className='max-w-4xl max-h-[90vh] overflow-y-auto glass border-zinc-800'>
+                  <DialogHeader>
+                    <DialogTitle>Create New Course</DialogTitle>
+                  </DialogHeader>
+                  <CourseForm 
+                    token={token} 
+                    onSuccess={() => { 
+                      setShowCreateCourseDialog(false); 
+                      fetchData(); 
+                    }} 
+                  />
+                </DialogContent>
+              </Dialog>
+            </div>
+            
+            <Card className='glass border-zinc-800 overflow-hidden'>
+              <div className='overflow-x-auto'>
+                <Table>
+                  <TableHeader>
+                    <TableRow className='border-zinc-800'>
+                      <TableHead>Judul</TableHead>
+                      <TableHead>Kategori</TableHead>
+                      <TableHead>Tingkat</TableHead>
+                      <TableHead>Modules</TableHead>
+                      <TableHead>Durasi (min)</TableHead>
+                      <TableHead className='text-right'>Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {courses.map((course) => (
+                      <TableRow key={course.id} className='border-zinc-800'>
+                        <TableCell className='font-medium'>{course.title}</TableCell>
+                        <TableCell>
+                          <span className='px-2 py-1 rounded text-xs bg-purple-500/20 text-purple-400'>
+                            {course.category}
+                          </span>
+                        </TableCell>
+                        <TableCell>
+                          <span className={`px-2 py-1 rounded text-xs ${
+                            course.difficulty === 'beginner' ? 'bg-green-500/20 text-green-400' :
+                            course.difficulty === 'intermediate' ? 'bg-yellow-500/20 text-yellow-400' :
+                            'bg-red-500/20 text-red-400'
+                          }`}>
+                            {course.difficulty}
+                          </span>
+                        </TableCell>
+                        <TableCell>{course.modules?.length || 0}</TableCell>
+                        <TableCell>{course.total_duration_minutes}</TableCell>
+                        <TableCell className='text-right space-x-2'>
+                          <Button
+                            variant='ghost'
+                            size='sm'
+                            onClick={() => setEditingCourse(course)}
+                          >
+                            <Edit className='w-4 h-4' />
+                          </Button>
+                          <Button
+                            variant='ghost'
+                            size='sm'
+                            onClick={() => handleDeleteCourse(course.id)}
+                            className='text-red-400 hover:text-red-300'
+                          >
+                            <Trash2 className='w-4 h-4' />
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            </Card>
+
+            {/* Edit Course Dialog */}
+            {editingCourse && (
+              <Dialog open={!!editingCourse} onOpenChange={() => setEditingCourse(null)}>
+                <DialogContent className='max-w-4xl max-h-[90vh] overflow-y-auto glass border-zinc-800'>
+                  <DialogHeader>
+                    <DialogTitle>Edit Course</DialogTitle>
+                  </DialogHeader>
+                  <CourseForm 
+                    token={token} 
+                    courseData={editingCourse}
+                    onSuccess={() => { 
+                      setEditingCourse(null); 
+                      fetchData(); 
+                    }} 
+                  />
+                </DialogContent>
+              </Dialog>
+            )}
+          </TabsContent>
+
+
           {/* Users Tab */}
           <TabsContent value='users' className='space-y-4 mt-6'>
             <Card className='glass border-zinc-800 overflow-hidden'>
