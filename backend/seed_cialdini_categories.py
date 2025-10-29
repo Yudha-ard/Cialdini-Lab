@@ -312,9 +312,7 @@ async def seed_cialdini_challenges():
                         "Trading bot bisa profit segitu"
                     ],
                     "correct_answer": 1,
-                    "explanation": "Red flags: 1) Unrealistic returns, 2) No #ad disclosure (FTC/EU requires), 3) Generic testimonial, 4) Inspect element makes fake screenshot in 30 seconds. Many influencers promote scam for quick $.
-
-"
+                    "explanation": "Red flags: 1) Unrealistic returns, 2) No #ad disclosure (FTC/EU requires), 3) Generic testimonial, 4) Inspect element makes fake screenshot in 30 seconds. Many influencers promote scam for quick money."
                 },
                 {
                     "question": "Verify legit vs paid scam endorsement?",
