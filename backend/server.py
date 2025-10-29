@@ -485,6 +485,68 @@ async def get_education_content(content_type: Optional[str] = None):
     contents = await db.education.find(query, {"_id": 0}).to_list(1000)
     return contents
 
+@api_router.post("/admin/education")
+async def create_education(content: EducationContent, current_user: dict = Depends(get_current_user)):
+    if current_user.get('role') != 'admin':
+        raise HTTPException(status_code=403, detail="Akses ditolak")
+    
+    content_dict = content.model_dump()
+    await db.education.insert_one(content_dict)
+    return content
+
+@api_router.put("/admin/education/{content_id}")
+async def update_education(content_id: str, content: EducationContent, current_user: dict = Depends(get_current_user)):
+    if current_user.get('role') != 'admin':
+        raise HTTPException(status_code=403, detail="Akses ditolak")
+    
+    content_dict = content.model_dump()
+    result = await db.education.update_one(
+        {"id": content_id},
+        {"$set": content_dict}
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Content tidak ditemukan")
+    
+    return {"message": "Content berhasil diupdate"}
+
+@api_router.delete("/admin/education/{content_id}")
+async def delete_education(content_id: str, current_user: dict = Depends(get_current_user)):
+    if current_user.get('role') != 'admin':
+        raise HTTPException(status_code=403, detail="Akses ditolak")
+    
+    result = await db.education.delete_one({"id": content_id})
+    
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Content tidak ditemukan")
+    
+    return {"message": "Content berhasil dihapus"}
+
+# ===== DAILY CHALLENGE =====
+@api_router.get("/daily-challenge")
+async def get_daily_challenge():
+    # Get a random challenge for today (same challenge for everyone today)
+    import hashlib
+    today = datetime.now(timezone.utc).date().isoformat()
+    seed = int(hashlib.md5(today.encode()).hexdigest(), 16)
+    
+    all_challenges = await db.challenges.find({}, {"_id": 0}).to_list(1000)
+    if not all_challenges:
+        raise HTTPException(status_code=404, detail="Tidak ada challenge tersedia")
+    
+    # Deterministic random based on date
+    daily_index = seed % len(all_challenges)
+    daily_challenge = all_challenges[daily_index]
+    
+    if isinstance(daily_challenge['created_at'], str):
+        daily_challenge['created_at'] = datetime.fromisoformat(daily_challenge['created_at'])
+    
+    return {
+        "challenge": daily_challenge,
+        "bonus_multiplier": 2,
+        "expires_in_hours": 24
+    }
+
 # ===== ADMIN ROUTES =====
 @api_router.post("/admin/challenges")
 async def create_challenge(challenge: Challenge, current_user: dict = Depends(get_current_user)):
