@@ -44,10 +44,35 @@ const LandingPage = () => {
   const features = [
     {
       icon: <Shield className="w-8 h-8" />,
-      title: "Skenario Realistis",
-      description: "Belajar dari kasus nyata yang terjadi di Indonesia"
+      title: "26+ Challenges",
+      description: "Challenges komprehensif berdasarkan 6 prinsip Cialdini dengan 150+ pertanyaan mendalam"
     },
     {
+      icon: <BookOpen className="w-8 h-8" />,
+      title: "Course System",
+      description: "Pembelajaran interaktif dengan slide, quiz, dan certificate untuk setiap course"
+    },
+    {
+      icon: <Terminal className="w-8 h-8" />,
+      title: "Mini Game",
+      description: "Spot the Phishing - game interaktif untuk latihan deteksi email phishing"
+    },
+    {
+      icon: <Award className="w-8 h-8" />,
+      title: "Achievement System",
+      description: "Unlock 8 achievements dengan 4 rarity levels dan unlock animations"
+    },
+    {
+      icon: <Users className="w-8 h-8" />,
+      title: "Leaderboard",
+      description: "Kompetisi real-time dengan streak counter dan daily challenge bonus"
+    },
+    {
+      icon: <Eye className="w-8 h-8" />,
+      title: "Kasus Indonesia",
+      description: "Pinjol predatory, e-commerce scams, crypto ponzi, MLM traps, romance scams"
+    }
+  ];
       icon: <Lock className="w-8 h-8" />,
       title: "6 Prinsip Cialdini",
       description: "Pahami teknik manipulasi psikologis"
