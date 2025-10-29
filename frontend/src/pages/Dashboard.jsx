@@ -97,16 +97,74 @@ const Dashboard = () => {
   return (
     <Layout>
       <div className="space-y-8" data-testid="dashboard-container">
-        {/* Welcome Section */}
+        {/* Welcome Section with Streak */}
         <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-emerald-500/10 to-cyan-500/10 p-8 border border-emerald-500/20">
-          <div className="relative z-10">
-            <h1 className="text-3xl sm:text-4xl font-bold mb-2">
-              Selamat Datang, <span className="text-emerald-400">{user?.full_name}</span>!
-            </h1>
-            <p className="text-gray-400 text-lg">Mari lanjutkan perjalanan belajar social engineering Anda</p>
+          <div className="relative z-10 flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl sm:text-4xl font-bold mb-2">
+                Selamat Datang, <span className="text-emerald-400">{user?.full_name}</span>!
+              </h1>
+              <p className="text-gray-400 text-lg">Mari lanjutkan perjalanan belajar social engineering Anda</p>
+            </div>
+            
+            {/* Streak Counter */}
+            {user?.streak_days > 0 && (
+              <div className="flex items-center gap-3 bg-orange-500/20 border border-orange-500/30 rounded-lg px-6 py-4">
+                <Flame className="w-8 h-8 text-orange-400 animate-pulse" />
+                <div>
+                  <div className="text-3xl font-bold text-orange-400">{user.streak_days}</div>
+                  <div className="text-sm text-orange-300">Hari Streak 🔥</div>
+                </div>
+              </div>
+            )}
           </div>
           <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/5 rounded-full blur-3xl"></div>
         </div>
+
+        {/* Daily Challenge Banner */}
+        {dailyChallenge && !user?.daily_challenge_completed && (
+          <Card 
+            className="glass border-yellow-500/30 p-6 cursor-pointer card-hover"
+            onClick={() => navigate(`/challenges/${dailyChallenge.challenge.id}?daily=true`)}
+            data-testid="daily-challenge-banner"
+          >
+            <div className="flex items-center gap-4">
+              <div className="w-16 h-16 rounded-full bg-yellow-500/20 flex items-center justify-center">
+                <Gift className="w-8 h-8 text-yellow-400 animate-bounce" />
+              </div>
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-2">
+                  <Badge className="bg-yellow-500/20 text-yellow-400 border-yellow-500/30">
+                    DAILY CHALLENGE
+                  </Badge>
+                  <Badge variant="outline" className="text-orange-400 border-orange-500/30">
+                    2x POINTS! 🔥
+                  </Badge>
+                </div>
+                <h3 className="text-xl font-bold mb-1">{dailyChallenge.challenge.title}</h3>
+                <p className="text-gray-400">{dailyChallenge.challenge.description}</p>
+              </div>
+              <div className="text-right">
+                <div className="text-3xl font-bold text-yellow-400">{dailyChallenge.challenge.points * 2}</div>
+                <div className="text-sm text-gray-400">bonus points</div>
+              </div>
+            </div>
+          </Card>
+        )}
+
+        {user?.daily_challenge_completed && (
+          <Card className="glass border-emerald-500/30 p-6">
+            <div className="flex items-center gap-4">
+              <div className="w-16 h-16 rounded-full bg-emerald-500/20 flex items-center justify-center">
+                <Calendar className="w-8 h-8 text-emerald-400" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-xl font-bold text-emerald-400 mb-1">✓ Daily Challenge Completed!</h3>
+                <p className="text-gray-400">Kembali besok untuk daily challenge baru dengan bonus 2x points</p>
+              </div>
+            </div>
+          </Card>
+        )}
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
