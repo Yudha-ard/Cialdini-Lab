@@ -216,6 +216,35 @@ const Dashboard = () => {
           completedChallenges={user?.completed_challenges || []}
         />
 
+
+        {/* Activity Heatmap - KEJUTAN! */}
+        <ActivityHeatmap activityData={[]} />
+        
+        {/* Today's Stats - KEJUTAN! */}
+        <Card className="glass border-zinc-800 p-6">
+          <div className="flex items-center gap-3 mb-4">
+            <Clock className="w-6 h-6 text-cyan-400" />
+            <h3 className="text-xl font-semibold">Statistik Hari Ini</h3>
+          </div>
+          <div className="grid grid-cols-3 gap-4">
+            <div className="text-center p-4 bg-emerald-500/10 rounded-lg">
+              <Award className="w-8 h-8 mx-auto mb-2 text-emerald-400" />
+              <p className="text-2xl font-bold text-emerald-400">0</p>
+              <p className="text-sm text-gray-400">Challenges Today</p>
+            </div>
+            <div className="text-center p-4 bg-purple-500/10 rounded-lg">
+              <Zap className="w-8 h-8 mx-auto mb-2 text-purple-400" />
+              <p className="text-2xl font-bold text-purple-400">0</p>
+              <p className="text-sm text-gray-400">Points Earned</p>
+            </div>
+            <div className="text-center p-4 bg-yellow-500/10 rounded-lg">
+              <TrendingUp className="w-8 h-8 mx-auto mb-2 text-yellow-400" />
+              <p className="text-2xl font-bold text-yellow-400">0%</p>
+              <p className="text-sm text-gray-400">Accuracy Rate</p>
+            </div>
+          </div>
+        </Card>
+
         {/* Quick Actions */}
         <div className="grid md:grid-cols-2 gap-6">
           <Link to="/challenges">
