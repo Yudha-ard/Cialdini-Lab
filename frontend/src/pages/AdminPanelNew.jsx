@@ -667,28 +667,6 @@ const UserEditForm = ({ token, userData, onSuccess }) => {
   );
 };
 
-
-            <DialogHeader>
-              <DialogTitle className='text-2xl'>Edit Challenge</DialogTitle>
-            </DialogHeader>
-            <ChallengeForm 
-              token={token}
-              challenge={editingChallenge}
-              onSuccess={() => { 
-                setEditingChallenge(null); 
-                fetchData(); 
-              }} 
-            />
-          </DialogContent>
-        </Dialog>
-      )}
-    </Layout>
-  );
-};
-
-// Challenge Form Component
-
-
 // Education Form Component
 const EducationForm = ({ token, educationData, onSuccess }) => {
   const [formData, setFormData] = useState(educationData || {
