@@ -2,7 +2,7 @@
 
 🎯 **Platform pembelajaran cybersecurity pertama di Indonesia** yang fokus pada social engineering dengan kasus nyata Indonesia.
 
-![Version](https://img.shields.io/badge/version-2.0-emerald) ![By Tegalsec](https://img.shields.io/badge/by-Tegalsec%20Community-cyan) ![Challenges](https://img.shields.io/badge/challenges-25%2B-yellow)
+![Version](https://img.shields.io/badge/version-3.0-emerald) ![By Tegalsec](https://img.shields.io/badge/by-Tegalsec%20Community-cyan) ![Challenges](https://img.shields.io/badge/challenges-30%2B-yellow)
 
 ## 🌟 Tentang Project
 
@@ -10,18 +10,21 @@ Tegalsec Social Engineering Lab adalah platform edukasi hands-on untuk memahami,
 
 ### ✨ Fitur Utama
 
-**🎯 Challenge System**
-- 25+ challenges interaktif dengan kasus nyata Indonesia
+**🎯 Challenge System (NEW: Cialdini Categories)**
+- 30+ challenges interaktif dengan kasus nyata Indonesia
+- **Grouped by Cialdini's 6 Principles**: Reciprocity, Commitment, Social Proof, Authority, Liking, Scarcity
 - Multi-question per challenge (3-4 pertanyaan mendalam)
-- Organized by Cialdini's 6 principles
+- Indonesian-specific cases: Pinjol predatory, E-commerce scams, Crypto Ponzi, MLM traps
 - Time-based scoring dengan speed multipliers
 - Partial credit system
+- Tab navigation per kategori Cialdini
 
-**📚 Course System**
+**📚 Course System (Enhanced)**
 - Interactive slide-based learning
-- Module-by-module progression
+- Module-by-module progression with nested structure
 - Progress tracking per user
-- Admin CRUD untuk create/edit courses
+- **Admin CRUD**: Create/Edit courses dengan module & slide management
+- Prerequisites & Learning outcomes tracking
 
 **⚡ Quiz Mode (Rapid Fire)**
 - 10 random questions
@@ -29,18 +32,48 @@ Tegalsec Social Engineering Lab adalah platform edukasi hands-on untuk memahami,
 - 1.5x speed bonus
 - Confetti animation untuk high score
 
+**🎮 Mini Game: "Spot the Phishing" (NEW!)**
+- Quick interactive game untuk latihan deteksi phishing
+- Real-world email examples (legitimate vs phishing)
+- 60 seconds time limit dengan 3 lives
+- Streak bonus system (+2pts per streak)
+- Red flags education setelah game over
+- Score leaderboard
+
+**🏆 Achievement System (NEW!)**
+- 8 unlockable achievements dengan rarity tiers
+- Unlock animations dengan confetti
+- Achievement points tracking
+- Locked achievements dengan mystery reveal
+- Rarity levels: Common, Rare, Epic, Legendary
+- Toast notifications untuk new unlocks
+
+**📱 Social Sharing (NEW!)**
+- Share certificates ke social media
+- Twitter, Facebook, LinkedIn integration
+- Copy-to-clipboard functionality
+- Custom share text dengan achievement highlights
+
 **🔥 Gamification**
 - Daily Challenge (2x points bonus)
-- Streak system (consecutive days)
-- Badge & Achievement system
+- Streak system (consecutive days with animation)
+- Badge & Achievement system dengan unlock animations
 - Certificate auto-generation
 - Leaderboard real-time
 
-**👨‍💼 Admin Panel**
-- Full CRUD: Challenges, Education, Courses
+**👨‍💼 Admin Panel (Enhanced)**
+- Full CRUD: Challenges, Courses, **Education (NEW)**
+- Course module & slide management
+- Education content management by Cialdini principle
 - User management & statistics
 - Recent activity monitoring
 - Platform analytics dashboard
+
+**📚 Education CRUD (NEW)**
+- Admin can create/edit/delete education content
+- Content types: Cialdini Principle, Prevention Tips, Case Study
+- Filterable by principle
+- Rich text support
 
 **🔐 Security Features**
 - JWT authentication (multi-role: Admin/User)
