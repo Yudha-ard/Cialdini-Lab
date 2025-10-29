@@ -1,19 +1,23 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext, API } from '@/App';
 import Layout from '@/components/Layout';
 import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { Trophy, Target, TrendingUp, Zap } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Trophy, Target, TrendingUp, Zap, Flame, Gift, Calendar } from 'lucide-react';
 import axios from 'axios';
 
 const Dashboard = () => {
   const { user, token } = React.useContext(AuthContext);
+  const navigate = useNavigate();
   const [progress, setProgress] = useState(null);
+  const [dailyChallenge, setDailyChallenge] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchProgress();
+    fetchDailyChallenge();
   }, []);
 
   const fetchProgress = async () => {
@@ -26,6 +30,15 @@ const Dashboard = () => {
       console.error('Failed to fetch progress:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchDailyChallenge = async () => {
+    try {
+      const response = await axios.get(`${API}/daily-challenge`);
+      setDailyChallenge(response.data);
+    } catch (error) {
+      console.error('Failed to fetch daily challenge:', error);
     }
   };
 
