@@ -376,8 +376,144 @@ async def create_challenge(challenge: Challenge, current_user: dict = Depends(ge
     await db.challenges.insert_one(challenge_dict)
     return challenge
 
+@api_router.put("/admin/challenges/{challenge_id}")
+async def update_challenge(challenge_id: str, challenge: Challenge, current_user: dict = Depends(get_current_user)):
+    if current_user.get('role') != 'admin':
+        raise HTTPException(status_code=403, detail="Akses ditolak")
+    
+    challenge_dict = challenge.model_dump()
+    challenge_dict['created_at'] = challenge_dict['created_at'].isoformat()
+    
+    result = await db.challenges.update_one(
+        {"id": challenge_id},
+        {"$set": challenge_dict}
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Challenge tidak ditemukan")
+    
+    return {"message": "Challenge berhasil diupdate"}
+
+@api_router.delete("/admin/challenges/{challenge_id}")
+async def delete_challenge(challenge_id: str, current_user: dict = Depends(get_current_user)):
+    if current_user.get('role') != 'admin':
+        raise HTTPException(status_code=403, detail="Akses ditolak")
+    
+    result = await db.challenges.delete_one({"id": challenge_id})
+    
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Challenge tidak ditemukan")
+    
+    return {"message": "Challenge berhasil dihapus"}
+
+@api_router.get("/admin/users")
+async def get_all_users(current_user: dict = Depends(get_current_user)):
+    if current_user.get('role') != 'admin':
+        raise HTTPException(status_code=403, detail="Akses ditolak")
+    
+    users = await db.users.find({}, {"_id": 0, "password": 0}).to_list(1000)
+    return users
+
 @api_router.get("/admin/stats")
 async def get_admin_stats(current_user: dict = Depends(get_current_user)):
+    if current_user.get('role') != 'admin':
+        raise HTTPException(status_code=403, detail="Akses ditolak")
+    
+    total_users = await db.users.count_documents({})
+    total_challenges = await db.challenges.count_documents({})
+    total_attempts = await db.attempts.count_documents({})
+    total_feedbacks = await db.feedbacks.count_documents({})
+    
+    # Recent activity
+    recent_attempts = await db.attempts.find({}, {"_id": 0}).sort("timestamp", -1).limit(10).to_list(10)
+    recent_feedbacks = await db.feedbacks.find({}, {"_id": 0}).sort("created_at", -1).limit(10).to_list(10)
+    
+    return {
+        "total_users": total_users,
+        "total_challenges": total_challenges,
+        "total_attempts": total_attempts,
+        "total_feedbacks": total_feedbacks,
+        "recent_attempts": recent_attempts,
+        "recent_feedbacks": recent_feedbacks
+    }
+
+# ===== HINTS SYSTEM =====
+@api_router.post("/challenges/{challenge_id}/hint")
+async def get_hint(challenge_id: str, hint_data: dict, current_user: dict = Depends(get_current_user)):
+    question_index = hint_data.get('question_index')
+    
+    challenge = await db.challenges.find_one({"id": challenge_id}, {"_id": 0})
+    if not challenge:
+        raise HTTPException(status_code=404, detail="Challenge tidak ditemukan")
+    
+    if question_index >= len(challenge['questions']):
+        raise HTTPException(status_code=400, detail="Question index invalid")
+    
+    # Check if user has enough points
+    user_points = current_user.get('points', 0)
+    hint_cost = 10
+    
+    if user_points < hint_cost:
+        raise HTTPException(status_code=400, detail="Poin tidak cukup untuk hint")
+    
+    # Deduct points
+    new_points = user_points - hint_cost
+    await db.users.update_one(
+        {"id": current_user['id']},
+        {"$set": {"points": new_points}}
+    )
+    
+    # Save hint request
+    hint_req = HintRequest(
+        user_id=current_user['id'],
+        challenge_id=challenge_id,
+        question_index=question_index,
+        hint_cost=hint_cost
+    )
+    hint_dict = hint_req.model_dump()
+    hint_dict['created_at'] = hint_dict['created_at'].isoformat()
+    await db.hints.insert_one(hint_dict)
+    
+    # Generate hint (first 50% of explanation)
+    explanation = challenge['questions'][question_index]['explanation']
+    hint_text = explanation[:len(explanation)//2] + "..."
+    
+    return {
+        "hint": hint_text,
+        "points_remaining": new_points,
+        "hint_cost": hint_cost
+    }
+
+# ===== BADGES/ACHIEVEMENTS =====
+@api_router.get("/badges")
+async def get_badges():
+    badges = [
+        {"id": "first_blood", "name": "First Blood", "description": "Selesaikan challenge pertama", "icon": "🎯", "requirement": "Complete 1 challenge"},
+        {"id": "phishing_hunter", "name": "Phishing Hunter", "description": "Selesaikan 3 challenge phishing", "icon": "🎣", "requirement": "Complete 3 phishing challenges"},
+        {"id": "social_expert", "name": "Social Expert", "description": "Selesaikan semua kategori challenge", "icon": "🏆", "requirement": "Complete all categories"},
+        {"id": "speed_demon", "name": "Speed Demon", "description": "Selesaikan challenge dalam <1 menit", "icon": "⚡", "requirement": "Complete challenge in under 60 seconds"},
+        {"id": "perfectionist", "name": "Perfectionist", "description": "Dapat 100% di 5 challenge", "icon": "💎", "requirement": "Get 100% on 5 challenges"},
+    ]
+    return badges
+
+@api_router.get("/user/badges")
+async def get_user_badges(current_user: dict = Depends(get_current_user)):
+    # Check earned badges based on user progress
+    attempts = await db.attempts.find({"user_id": current_user['id']}, {"_id": 0}).to_list(1000)
+    completed = current_user.get('completed_challenges', [])
+    
+    earned_badges = []
+    
+    # First Blood
+    if len(completed) >= 1:
+        earned_badges.append("first_blood")
+    
+    # Perfectionist - 5 perfect scores
+    perfect_count = sum(1 for att in attempts if att.get('is_completed', False))
+    if perfect_count >= 5:
+        earned_badges.append("perfectionist")
+    
+    return {"earned_badges": earned_badges}
     if current_user.get('role') != 'admin':
         raise HTTPException(status_code=403, detail="Akses ditolak")
     
