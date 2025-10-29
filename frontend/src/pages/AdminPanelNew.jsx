@@ -19,11 +19,14 @@ const AdminPanelNew = () => {
   const [stats, setStats] = useState(null);
   const [challenges, setChallenges] = useState([]);
   const [courses, setCourses] = useState([]);
+  const [education, setEducation] = useState([]);
   const [users, setUsers] = useState([]);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [showCreateCourseDialog, setShowCreateCourseDialog] = useState(false);
+  const [showCreateEducationDialog, setShowCreateEducationDialog] = useState(false);
   const [editingChallenge, setEditingChallenge] = useState(null);
   const [editingCourse, setEditingCourse] = useState(null);
+  const [editingEducation, setEditingEducation] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
