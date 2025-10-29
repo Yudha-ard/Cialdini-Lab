@@ -369,12 +369,6 @@ const Challenges = () => {
             );
           })}
         </Tabs>
-
-        {filteredChallenges.length === 0 && (
-          <div className="text-center py-16">
-            <p className="text-gray-400 text-lg">Tidak ada challenge yang sesuai dengan filter</p>
-          </div>
-        )}
       </div>
     </Layout>
   );
