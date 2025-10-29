@@ -170,51 +170,67 @@ const Challenges = () => {
     <Layout>
       <div className="space-y-8" data-testid="challenges-container">
         <div>
-          <h1 className="text-4xl font-bold mb-3">Challenges</h1>
-          <p className="text-gray-400 text-lg">Pilih challenge dan uji kemampuan Anda dalam mendeteksi social engineering</p>
+          <h1 className="text-4xl font-bold mb-3">
+            <span className="bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
+              Cialdini's Principles
+            </span> Challenges
+          </h1>
+          <p className="text-gray-400 text-lg">Pelajari 6 prinsip pengaruh Cialdini melalui kasus nyata social engineering</p>
         </div>
 
-        {/* Filters */}
-        <Card className="glass border-zinc-800 p-6">
-          <div className="grid md:grid-cols-2 gap-4">
-            <div>
-              <label className="text-sm text-gray-400 mb-2 block">Kategori</label>
-              <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-                <SelectTrigger className="bg-zinc-900/50 border-zinc-800" data-testid="category-filter">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Semua Kategori</SelectItem>
-                  <SelectItem value="phishing">Phishing</SelectItem>
-                  <SelectItem value="pretexting">Pretexting</SelectItem>
-                  <SelectItem value="baiting">Baiting</SelectItem>
-                  <SelectItem value="quid_pro_quo">Quid Pro Quo</SelectItem>
-                  <SelectItem value="tailgating">Tailgating</SelectItem>
-                  <SelectItem value="money_app">Aplikasi Uang</SelectItem>
-                  <SelectItem value="indonesian_case">Kasus Indonesia</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <label className="text-sm text-gray-400 mb-2 block">Kesulitan</label>
-              <Select value={difficultyFilter} onValueChange={setDifficultyFilter}>
-                <SelectTrigger className="bg-zinc-900/50 border-zinc-800" data-testid="difficulty-filter">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Semua Level</SelectItem>
-                  <SelectItem value="beginner">Pemula</SelectItem>
-                  <SelectItem value="intermediate">Menengah</SelectItem>
-                  <SelectItem value="advanced">Lanjutan</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-        </Card>
+        {/* Cialdini Tabs */}
+        <Tabs defaultValue="all" className="w-full">
+          <TabsList className="grid w-full grid-cols-7 bg-zinc-900/50 p-1">
+            <TabsTrigger value="all" className="text-xs sm:text-sm">Semua</TabsTrigger>
+            <TabsTrigger value="reciprocity" className="text-xs sm:text-sm">Reciprocity</TabsTrigger>
+            <TabsTrigger value="commitment" className="text-xs sm:text-sm">Commitment</TabsTrigger>
+            <TabsTrigger value="social_proof" className="text-xs sm:text-sm">Social Proof</TabsTrigger>
+            <TabsTrigger value="authority" className="text-xs sm:text-sm">Authority</TabsTrigger>
+            <TabsTrigger value="liking" className="text-xs sm:text-sm">Liking</TabsTrigger>
+            <TabsTrigger value="scarcity" className="text-xs sm:text-sm">Scarcity</TabsTrigger>
+          </TabsList>
 
-        {/* Challenges Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredChallenges.map((challenge) => (
+          {/* All Challenges Tab */}
+          <TabsContent value="all" className="space-y-6 mt-6">
+            <Card className="glass border-zinc-800 p-6">
+              <div className="grid md:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm text-gray-400 mb-2 block">Kategori</label>
+                  <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+                    <SelectTrigger className="bg-zinc-900/50 border-zinc-800">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Semua Kategori</SelectItem>
+                      <SelectItem value="phishing">Phishing</SelectItem>
+                      <SelectItem value="pretexting">Pretexting</SelectItem>
+                      <SelectItem value="baiting">Baiting</SelectItem>
+                      <SelectItem value="quid_pro_quo">Quid Pro Quo</SelectItem>
+                      <SelectItem value="tailgating">Tailgating</SelectItem>
+                      <SelectItem value="money_app">Aplikasi Uang</SelectItem>
+                      <SelectItem value="indonesian_case">Kasus Indonesia</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <label className="text-sm text-gray-400 mb-2 block">Kesulitan</label>
+                  <Select value={difficultyFilter} onValueChange={setDifficultyFilter}>
+                    <SelectTrigger className="bg-zinc-900/50 border-zinc-800">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Semua Level</SelectItem>
+                      <SelectItem value="beginner">Pemula</SelectItem>
+                      <SelectItem value="intermediate">Menengah</SelectItem>
+                      <SelectItem value="advanced">Lanjutan</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </Card>
+
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredChallenges.map((challenge) => (
             <Card 
               key={challenge.id} 
               className={`glass border-zinc-800 p-6 card-hover relative overflow-hidden ${
