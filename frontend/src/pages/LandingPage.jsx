@@ -73,21 +73,6 @@ const LandingPage = () => {
       description: "Pinjol predatory, e-commerce scams, crypto ponzi, MLM traps, romance scams"
     }
   ];
-      icon: <Lock className="w-8 h-8" />,
-      title: "6 Prinsip Cialdini",
-      description: "Pahami teknik manipulasi psikologis"
-    },
-    {
-      icon: <Award className="w-8 h-8" />,
-      title: "Sistem Gamifikasi",
-      description: "Level, poin, dan leaderboard untuk motivasi belajar"
-    },
-    {
-      icon: <BookOpen className="w-8 h-8" />,
-      title: "Konten Edukatif",
-      description: "Penjelasan mendalam dan tips pencegahan"
-    }
-  ];
 
   if (showAuth) {
     return (
