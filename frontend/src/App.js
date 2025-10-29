@@ -17,6 +17,7 @@ import Courses from '@/pages/Courses';
 import CourseViewer from '@/pages/CourseViewer';
 import QuizMode from '@/pages/QuizMode';
 import SpotThePhishing from '@/pages/SpotThePhishing';
+import Profile from '@/pages/Profile';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 export const API = `${BACKEND_URL}/api`;
