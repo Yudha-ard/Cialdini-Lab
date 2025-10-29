@@ -323,6 +323,7 @@ async def attempt_challenge(challenge_id: str, answer: dict, current_user: dict 
     
     answers = answer.get('answers', [])
     time_taken = answer.get('time_taken_seconds', 0)
+    is_daily = answer.get('is_daily_challenge', False)
     
     # Calculate correct answers
     correct_count = 0
@@ -339,10 +340,39 @@ async def attempt_challenge(challenge_id: str, answer: dict, current_user: dict 
             "explanation": question['explanation']
         })
     
-    # Calculate points (partial credit for getting some right)
+    # Calculate points with TIME BONUS
     base_points = challenge['points']
     points_per_question = base_points / total_questions
-    points_earned = int(correct_count * points_per_question)
+    earned_points = correct_count * points_per_question
+    
+    # Time bonus calculation
+    time_limit = challenge.get('time_limit_seconds', 300)
+    time_bonus = 0
+    speed_multiplier = 1.0
+    
+    if time_taken > 0 and time_taken < time_limit:
+        # Speed bonus: finish under 50% time = 1.5x, under 30% = 2x
+        time_ratio = time_taken / time_limit
+        if time_ratio < 0.3:
+            speed_multiplier = 2.0
+            time_bonus = int(earned_points * 1.0)  # 100% bonus
+        elif time_ratio < 0.5:
+            speed_multiplier = 1.5
+            time_bonus = int(earned_points * 0.5)  # 50% bonus
+        elif time_ratio < 0.7:
+            speed_multiplier = 1.2
+            time_bonus = int(earned_points * 0.2)  # 20% bonus
+    
+    final_points = int(earned_points + time_bonus)
+    
+    # Daily challenge bonus (2x points)
+    if is_daily and not current_user.get('daily_challenge_completed', False):
+        final_points = final_points * 2
+        await db.users.update_one(
+            {"id": current_user['id']},
+            {"$set": {"daily_challenge_completed": True}}
+        )
+    
     is_completed = correct_count == total_questions
     
     # Save attempt
@@ -353,7 +383,7 @@ async def attempt_challenge(challenge_id: str, answer: dict, current_user: dict 
         correct_count=correct_count,
         total_questions=total_questions,
         is_completed=is_completed,
-        points_earned=points_earned,
+        points_earned=final_points,
         time_taken_seconds=time_taken
     )
     attempt_dict = attempt.model_dump()
@@ -362,13 +392,15 @@ async def attempt_challenge(challenge_id: str, answer: dict, current_user: dict 
     
     # Update user progress if completed and not already completed
     if is_completed and challenge_id not in current_user.get('completed_challenges', []):
-        new_points = current_user.get('points', 0) + points_earned
+        new_points = current_user.get('points', 0) + final_points
         completed = current_user.get('completed_challenges', [])
         completed.append(challenge_id)
         
         # Update level based on points
         level = "Beginner"
-        if new_points >= 500:
+        if new_points >= 1000:
+            level = "Expert"
+        elif new_points >= 500:
             level = "Advanced"
         elif new_points >= 200:
             level = "Intermediate"
@@ -386,7 +418,9 @@ async def attempt_challenge(challenge_id: str, answer: dict, current_user: dict 
         "correct_count": correct_count,
         "total_questions": total_questions,
         "is_completed": is_completed,
-        "points_earned": points_earned,
+        "points_earned": final_points,
+        "time_bonus": time_bonus,
+        "speed_multiplier": speed_multiplier,
         "results": results,
         "tips": challenge['tips']
     }
