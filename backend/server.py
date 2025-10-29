@@ -683,6 +683,51 @@ async def get_admin_stats(current_user: dict = Depends(get_current_user)):
         raise HTTPException(status_code=403, detail="Akses ditolak")
     
     total_users = await db.users.count_documents({})
+
+@api_router.put("/admin/users/{user_id}")
+async def update_user_by_admin(
+    user_id: str,
+    full_name: str,
+    email: str,
+    password: Optional[str] = None,
+    current_user: dict = Depends(get_current_user)
+):
+    if current_user.get('role') != 'admin':
+        raise HTTPException(status_code=403, detail="Akses ditolak")
+    
+    update_data = {"full_name": full_name, "email": email}
+    
+    # Only update password if provided
+    if password:
+        update_data["password"] = pwd_context.hash(password)
+    
+    result = await db.users.update_one(
+        {"id": user_id},
+        {"$set": update_data}
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="User tidak ditemukan")
+    
+    return {"message": "User updated successfully"}
+
+@api_router.delete("/admin/users/{user_id}")
+async def delete_user_by_admin(user_id: str, current_user: dict = Depends(get_current_user)):
+    if current_user.get('role') != 'admin':
+        raise HTTPException(status_code=403, detail="Akses ditolak")
+    
+    # Prevent deleting self
+    if user_id == current_user['id']:
+        raise HTTPException(status_code=400, detail="Tidak bisa menghapus akun sendiri")
+    
+    result = await db.users.delete_one({"id": user_id})
+    
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="User tidak ditemukan")
+    
+    return {"message": "User deleted successfully"}
+
+
     total_challenges = await db.challenges.count_documents({})
     total_attempts = await db.attempts.count_documents({})
     total_feedbacks = await db.feedbacks.count_documents({})
