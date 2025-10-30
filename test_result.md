@@ -114,11 +114,11 @@ user_problem_statement: |
 backend:
   - task: "Single-play restriction: Quiz completion tracking"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
@@ -130,6 +130,31 @@ backend:
           - Store quiz completion data: correct_count, total_questions, points_earned, time_taken, accuracy
           - Added GET /api/quiz/completion-status endpoint to check completion status
           - Returns completion data if completed, or completed: false if not
+      - working: true
+        agent: "testing"
+        comment: |
+          BACKEND TESTING COMPLETED - QUIZ GLOBAL RESTRICTION WORKING PERFECTLY
+          
+          ✅ QUIZ COMPLETION TRACKING TESTS:
+          ✅ Initial Status Check: Quiz correctly shows as not completed for new user
+          ✅ Quiz Generation: Successfully retrieved 10 random quiz questions
+          ✅ First Submission: Quiz submission works correctly (Score: 10/10, 100% accuracy)
+          ✅ Completion Status: Quiz marked as completed with proper data storage
+          ✅ GLOBAL RESTRICTION: Successfully prevented second quiz attempt with proper error message
+          
+          COMPREHENSIVE TEST RESULTS:
+          - Quiz Initial Status: ✅ PASS - Returns completed: false for new user
+          - Get Quiz Questions: ✅ PASS - Retrieved 10 questions successfully
+          - Quiz First Submission: ✅ PASS - Perfect score submission processed
+          - Quiz Completion Status: ✅ PASS - Marked as completed with 100% accuracy
+          - Quiz Replay Prevention: ✅ PASS - GLOBAL restriction enforced with proper error
+          
+          GLOBAL RESTRICTION VERIFIED:
+          - Once any quiz is completed, all future quiz attempts are blocked
+          - Error message: "Quiz sudah pernah diselesaikan. Kamu hanya bisa mengikuti quiz sekali."
+          - Previous completion data is preserved and accessible via completion-status endpoint
+          
+          All quiz completion tracking functionality is working correctly.
   
   - task: "Single-play restriction: Mini Game completion tracking"
     implemented: true
