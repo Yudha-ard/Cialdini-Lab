@@ -452,11 +452,11 @@ backend:
 frontend:
   - task: "Quiz Mode: Single-play restriction UI"
     implemented: true
-    working: "NA"
+    working: false
     file: "/app/frontend/src/pages/QuizMode.jsx"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
@@ -468,14 +468,36 @@ frontend:
           - Updated handleSubmit to catch 400 error and show proper message
           - Removed "Try Again" button from result screen (replaced with "Go to Dashboard")
           - Warning message: user can only take quiz once (GLOBAL restriction)
+      - working: false
+        agent: "testing"
+        comment: |
+          FRONTEND TESTING COMPLETED - AUTHENTICATION ISSUE BLOCKING UI TESTING
+          
+          ❌ QUIZ MODE SINGLE-PLAY RESTRICTION UI TESTING RESULTS:
+          ❌ Authentication Issue: Unable to access quiz page due to route protection
+          ❌ Page redirects to landing page when not authenticated
+          ❌ Cannot verify "Already Completed" screen without proper login
+          ❌ Cannot verify warning messages and UI elements
+          
+          AUTHENTICATION PROBLEM IDENTIFIED:
+          - Login form appears to accept credentials but doesn't redirect to dashboard
+          - All protected routes (/quiz, /spot-the-phishing, /challenges) redirect to landing page
+          - Frontend route protection is working (good security) but prevents UI testing
+          - Backend API calls are working (confirmed from logs) but frontend auth flow has issues
+          
+          RECOMMENDATION:
+          - Main agent should investigate frontend authentication flow
+          - Check token storage and validation in AuthContext
+          - Verify login API response handling
+          - Test with working credentials or fix auth flow
   
   - task: "Mini Game: Single-play restriction UI"
     implemented: true
-    working: "NA"
+    working: false
     file: "/app/frontend/src/pages/SpotThePhishing.jsx"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
@@ -488,14 +510,30 @@ frontend:
           - Shows previous results: score, time_taken, emails_answered, lives_remaining
           - Warning message: user can only play mini game once
           - endGame() now submits completion data to backend
+      - working: false
+        agent: "testing"
+        comment: |
+          FRONTEND TESTING COMPLETED - AUTHENTICATION ISSUE BLOCKING UI TESTING
+          
+          ❌ MINI GAME SINGLE-PLAY RESTRICTION UI TESTING RESULTS:
+          ❌ Authentication Issue: Unable to access mini game page due to route protection
+          ❌ Page redirects to landing page when not authenticated
+          ❌ Cannot verify "Already Completed" screen without proper login
+          ❌ Cannot verify warning messages and UI elements
+          
+          SAME AUTHENTICATION PROBLEM AS QUIZ MODE:
+          - All protected routes redirect to landing page
+          - Frontend route protection working but blocking testing
+          - Backend functionality confirmed working from logs
+          - Need to fix frontend authentication flow to test UI
   
   - task: "Challenge Detail: Single-play restriction UI"
     implemented: true
-    working: "NA"
+    working: false
     file: "/app/frontend/src/pages/ChallengeDetailNew.jsx"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
@@ -507,6 +545,22 @@ frontend:
           - Shows challenge title and previous completion date
           - Warning message: user can only complete each challenge once
           - Displays community feedback section even when completed
+      - working: false
+        agent: "testing"
+        comment: |
+          FRONTEND TESTING COMPLETED - AUTHENTICATION ISSUE BLOCKING UI TESTING
+          
+          ❌ CHALLENGE SINGLE-PLAY RESTRICTION UI TESTING RESULTS:
+          ❌ Authentication Issue: Unable to access challenge pages due to route protection
+          ❌ Pages redirect to landing page when not authenticated
+          ❌ Cannot verify "Already Completed" screen without proper login
+          ❌ Cannot verify warning messages and UI elements
+          
+          SAME AUTHENTICATION PROBLEM:
+          - Challenge list and detail pages redirect to landing page
+          - Frontend route protection working but blocking testing
+          - Backend functionality confirmed working from logs
+          - Need to fix frontend authentication flow to test UI
   
   - task: "Admin Panel: Quiz Questions CRUD UI"
     implemented: false
