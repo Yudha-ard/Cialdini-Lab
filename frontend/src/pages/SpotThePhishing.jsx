@@ -116,6 +116,52 @@ const SpotThePhishing = () => {
     }
   }, [gameState, timeLeft]);
 
+  // Check completion status on mount
+  useEffect(() => {
+    checkCompletionStatus();
+  }, []);
+
+  const checkCompletionStatus = async () => {
+    try {
+      const response = await axios.get(`${API}/minigame/completion-status/spot_the_phishing`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      if (response.data.completed) {
+        setAlreadyCompleted(true);
+        setPreviousResult(response.data.completion_data);
+        setGameState('completed');
+      }
+    } catch (error) {
+      console.error('Failed to check completion status:', error);
+    }
+  };
+
+  const submitGameCompletion = async (finalScore, timeTaken) => {
+    try {
+      await axios.post(
+        `${API}/minigame/complete`,
+        {
+          game_type: 'spot_the_phishing',
+          score: finalScore,
+          time_taken_seconds: timeTaken,
+          details: {
+            emails_answered: emailsAnswered,
+            lives_remaining: lives
+          }
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      toast.success(`Mini game complete! +${finalScore} poin`);
+    } catch (error) {
+      if (error.response?.status === 400) {
+        toast.error('Mini game sudah pernah diselesaikan sebelumnya!');
+      } else {
+        toast.error('Gagal menyimpan hasil mini game');
+      }
+    }
+  };
+
   const startGame = () => {
     setGameState('playing');
     setScore(0);
