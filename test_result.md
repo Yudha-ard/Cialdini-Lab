@@ -112,12 +112,125 @@ user_problem_statement: |
   - Admin CRUD untuk Quiz Questions dan Mini Game Scenarios
 
 backend:
+  - task: "Single-play restriction: Quiz completion tracking"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: |
+          Implemented GLOBAL quiz restriction:
+          - Modified POST /api/quiz/submit to check for existing completion
+          - Added QuizCompletion model
+          - If user has completed any quiz before, return 400 error with message
+          - Store quiz completion data: correct_count, total_questions, points_earned, time_taken, accuracy
+          - Added GET /api/quiz/completion-status endpoint to check completion status
+          - Returns completion data if completed, or completed: false if not
+  
+  - task: "Single-play restriction: Mini Game completion tracking"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: |
+          Implemented mini game completion tracking:
+          - Added MiniGameCompletion model
+          - Created GET /api/minigame/completion-status/{game_type} endpoint
+          - Created POST /api/minigame/complete endpoint
+          - Prevents replay after completion
+          - Awards points based on score
+          - Returns completion data when checking status
+  
+  - task: "Single-play restriction: Challenge completion tracking"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: |
+          Implemented challenge single-play restriction:
+          - Modified POST /api/challenges/{challenge_id}/attempt to check if already completed
+          - If completed, return 400 error with previous results in detail field
+          - Added GET /api/challenges/{challenge_id}/completion endpoint
+          - Fixed collection name from db.attempts to db.challenge_attempts
+          - Returns previous completion data when user tries to replay
+  
+  - task: "Admin: Reset completion status"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: |
+          Implemented admin reset functionality:
+          - Created POST /api/admin/reset-completion endpoint
+          - Accepts: user_id, type (quiz/minigame/challenge), specific_id (optional)
+          - Can reset all or specific completions per user
+          - Removes from completion collections
+          - Updates user's completed_challenges array for challenges
+          - Requires admin authentication
+  
+  - task: "Admin CRUD: Quiz Questions"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: |
+          Implemented Quiz Questions CRUD for admin:
+          - Added QuizQuestion model (question, options, correct_answer, explanation, category, difficulty)
+          - GET /api/admin/quiz-questions - List all questions
+          - POST /api/admin/quiz-questions - Create question
+          - PUT /api/admin/quiz-questions/{question_id} - Update question
+          - DELETE /api/admin/quiz-questions/{question_id} - Delete question
+          - All endpoints require admin authentication
+  
+  - task: "Admin CRUD: Mini Game Scenarios"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: |
+          Implemented Mini Game Scenarios CRUD for admin:
+          - Added MiniGameScenario model (game_type, title, description, image_url, is_phishing, indicators, difficulty)
+          - GET /api/admin/minigame-scenarios - List all scenarios
+          - POST /api/admin/minigame-scenarios - Create scenario
+          - PUT /api/admin/minigame-scenarios/{scenario_id} - Update scenario
+          - DELETE /api/admin/minigame-scenarios/{scenario_id} - Delete scenario
+          - All endpoints require admin authentication
+
   - task: "Course CRUD API endpoints"
     implemented: true
     working: true
     file: "/app/backend/server.py"
     stuck_count: 0
-    priority: "high"
+    priority: "medium"
     needs_retesting: false
     status_history:
       - working: "NA"
