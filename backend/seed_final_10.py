@@ -196,7 +196,7 @@ async def seed_final_10_challenges():
         },
         
         {
-            "id": str(uuid.uuid.uuid4()),
+            "id": str(uuid.uuid4()),
             "title": "Quid Pro Quo: Free Security Audit Scam",
             "category": "quid_pro_quo",
             "difficulty": "intermediate",
