@@ -1525,6 +1525,15 @@ const ChallengeForm = ({ token, challenge, onSuccess }) => {
     setFormData({ ...formData, questions: newQuestions });
   };
 
+  const removeQuestion = (index) => {
+    if (formData.questions.length <= 1) {
+      toast.error('Challenge harus memiliki minimal 1 pertanyaan');
+      return;
+    }
+    const newQuestions = formData.questions.filter((_, i) => i !== index);
+    setFormData({ ...formData, questions: newQuestions });
+  };
+
   return (
     <form onSubmit={handleSubmit} className='space-y-6'>
       <div className='grid md:grid-cols-2 gap-4'>
