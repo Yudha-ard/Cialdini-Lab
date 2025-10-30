@@ -1,0 +1,79 @@
+services:
+  mongodb:
+    image: mongo:7.0
+    container_name: tegalsec-mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: tegalsec_lab
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - tegalsec-network
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: tegalsec-backend
+    restart: unless-stopped
+    ports:
+      - "8001:8001"
+    environment:
+      - MONGO_URL=mongodb://mongodb:27017
+      - DB_NAME=tegalsec_lab
+      - JWT_SECRET_KEY=your-super-secret-jwt-key-change-this-in-production-${RANDOM_KEY:-default}
+      - ALGORITHM=HS256
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - tegalsec-network
+    command: >
+      sh -c "
+      echo 'Waiting for MongoDB...' &&
+      sleep 5 &&
+      echo 'Seeding database...' &&
+      python seed_data.py &&
+      python seed_indonesia_challenges.py &&
+      python seed_massive_challenges.py &&
+      python seed_final_10.py &&
+      python seed_courses.py &&
+      echo 'Database seeded successfully!' &&
+      echo 'Starting backend server...' &&
+      uvicorn server:app --host 0.0.0.0 --port 8001 --reload
+      "
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    container_name: tegalsec-frontend
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - REACT_APP_BACKEND_URL=http://localhost:8001
+      - WDS_SOCKET_PORT=0
+      - CHOKIDAR_USEPOLLING=true
+      - WATCHPACK_POLLING=true
+    depends_on:
+      - backend
+    networks:
+      - tegalsec-network
+    stdin_open: true
+    tty: true
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  tegalsec-network:
+    driver: bridge
