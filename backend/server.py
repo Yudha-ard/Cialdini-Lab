@@ -1034,7 +1034,92 @@ async def get_course_progress(course_id: str, current_user: dict = Depends(get_c
         "course_id": course_id
     }, {"_id": 0})
     
-    return progress or {"completed_modules": [], "current_slide": 0}
+    return progress or {"completed_modules": [], "current_slide": 0, "quiz_completed": False, "quiz_passed": False}
+
+@api_router.post("/courses/{course_id}/submit-quiz")
+async def submit_course_quiz(course_id: str, quiz_data: dict, current_user: dict = Depends(get_current_user)):
+    """Submit course quiz and check if passed"""
+    answers = quiz_data.get('answers', [])
+    
+    # Get course
+    course = await db.courses.find_one({"id": course_id}, {"_id": 0})
+    if not course:
+        raise HTTPException(status_code=404, detail="Course tidak ditemukan")
+    
+    # Get or create progress
+    progress = await db.course_progress.find_one({
+        "user_id": current_user['id'],
+        "course_id": course_id
+    })
+    
+    if not progress:
+        raise HTTPException(status_code=400, detail="Selesaikan modules terlebih dahulu")
+    
+    # Check if quiz already completed
+    if progress.get('quiz_completed'):
+        return {
+            "already_completed": True,
+            "score": progress.get('quiz_score', 0),
+            "passed": progress.get('quiz_passed', False),
+            "message": "Quiz sudah pernah diselesaikan"
+        }
+    
+    # Calculate score
+    quiz_questions = course.get('quiz_questions', [])
+    if not quiz_questions:
+        raise HTTPException(status_code=400, detail="Course ini tidak memiliki quiz")
+    
+    correct_count = sum(1 for i, ans in enumerate(answers) if i < len(quiz_questions) and ans == quiz_questions[i]['correct_answer'])
+    total_questions = len(quiz_questions)
+    score = int((correct_count / total_questions) * 100)
+    passing_score = course.get('passing_score', 70)
+    passed = score >= passing_score
+    
+    # Update progress
+    update_data = {
+        "quiz_completed": True,
+        "quiz_score": score,
+        "quiz_passed": passed
+    }
+    
+    # If passed, mark course as completed and issue certificate
+    if passed:
+        update_data["completed"] = True
+        update_data["completed_at"] = datetime.now(timezone.utc).isoformat()
+        
+        # Issue certificate
+        cert = Certificate(
+            user_id=current_user['id'],
+            username=current_user['username'],
+            full_name=current_user['full_name'],
+            achievement_type="course_completion",
+            achievement_title=f"Certificate of Completion: {course['title']}"
+        )
+        cert_dict = cert.model_dump()
+        cert_dict['issued_at'] = cert_dict['issued_at'].isoformat()
+        await db.certificates.insert_one(cert_dict)
+        
+        # Award points
+        bonus_points = 100
+        await db.users.update_one(
+            {"id": current_user['id']},
+            {"$inc": {"points": bonus_points}}
+        )
+    
+    await db.course_progress.update_one(
+        {"user_id": current_user['id'], "course_id": course_id},
+        {"$set": update_data}
+    )
+    
+    return {
+        "correct_count": correct_count,
+        "total_questions": total_questions,
+        "score": score,
+        "passing_score": passing_score,
+        "passed": passed,
+        "points_earned": 100 if passed else 0,
+        "certificate_issued": passed
+    }
 
 # ===== CERTIFICATES =====
 @api_router.get("/certificates")
