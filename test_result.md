@@ -308,7 +308,7 @@ agent_communication:
       
       1. Test Credentials:
          - Admin user: username=admin, password=admin123
-         - Backend URL: https://secsim-lab.preview.emergentagent.com/api
+         - Backend URL: https://securitytrainer-5.preview.emergentagent.com/api
       
       2. Test Scenarios (PRIORITY HIGH):
          a. GET /api/courses - Fetch all courses
