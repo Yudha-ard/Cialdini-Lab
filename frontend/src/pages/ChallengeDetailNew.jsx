@@ -162,6 +162,114 @@ const ChallengeDetailNew = () => {
     );
   }
 
+  // Show "Already Completed" screen
+  if (alreadyCompleted && previousResult) {
+    return (
+      <Layout>
+        <div className="max-w-4xl mx-auto space-y-6">
+          <Button 
+            variant="ghost" 
+            onClick={() => navigate('/challenges')}
+            className="text-gray-400 hover:text-gray-200"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Kembali ke Challenges
+          </Button>
+
+          <Card className="glass border-yellow-600/30 p-12 text-center">
+            <div className="w-24 h-24 rounded-full bg-yellow-500/10 flex items-center justify-center mx-auto mb-6">
+              <CheckCircle className="w-12 h-12 text-yellow-400" />
+            </div>
+            <h1 className="text-4xl font-bold mb-4">🏆 Challenge Sudah Diselesaikan!</h1>
+            <h2 className="text-2xl text-emerald-400 mb-4">{challenge.title}</h2>
+            <p className="text-gray-400 text-lg mb-8">
+              Kamu sudah menyelesaikan challenge ini sebelumnya.\nBerikut adalah hasil challenge kamu:
+            </p>
+            
+            <div className="grid md:grid-cols-3 gap-4 mb-8">
+              <div className="bg-zinc-900/50 rounded-lg p-6">
+                <div className="text-4xl font-bold text-emerald-400 mb-2">
+                  {previousResult.correct_count}/{previousResult.total_questions}
+                </div>
+                <div className="text-gray-400">Correct</div>
+              </div>
+              <div className="bg-zinc-900/50 rounded-lg p-6">
+                <div className="text-4xl font-bold text-purple-400 mb-2">
+                  +{previousResult.points_earned}
+                </div>
+                <div className="text-gray-400">Points Earned</div>
+              </div>
+              <div className="bg-zinc-900/50 rounded-lg p-6">
+                <div className="text-4xl font-bold text-yellow-400 mb-2">
+                  {previousResult.time_taken_seconds}s
+                </div>
+                <div className="text-gray-400">Time Taken</div>
+              </div>
+            </div>
+
+            <div className="mb-6 p-4 bg-zinc-900/50 rounded-lg">
+              <p className="text-xs text-gray-500">
+                Diselesaikan: {new Date(previousResult.completed_at).toLocaleDateString('id-ID', {
+                  day: 'numeric',
+                  month: 'long',
+                  year: 'numeric',
+                  hour: '2-digit',
+                  minute: '2-digit'
+                })}
+              </p>
+            </div>
+
+            <div className="p-4 bg-yellow-900/20 border border-yellow-600/30 rounded-lg mb-6">
+              <p className="text-yellow-400 text-sm">
+                ⚠️ Kamu hanya bisa menyelesaikan setiap challenge sekali. Hasil di atas adalah skor final kamu.
+              </p>
+            </div>
+
+            <div className="flex gap-4 justify-center">
+              <Button
+                onClick={() => navigate('/dashboard')}
+                className="bg-emerald-600 hover:bg-emerald-700"
+              >
+                Go to Dashboard
+              </Button>
+              <Button
+                onClick={() => navigate('/challenges')}
+                variant="outline"
+              >
+                Browse More Challenges
+              </Button>
+            </div>
+          </Card>
+
+          {/* Feedbacks Section */}
+          {feedbacks.length > 0 && (
+            <Card className="glass border-zinc-800 p-6">
+              <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
+                <MessageSquare className="w-5 h-5 text-cyan-400" />
+                Community Feedback
+              </h3>
+              <div className="space-y-4">
+                {feedbacks.map((fb, idx) => (
+                  <div key={idx} className="bg-zinc-900/50 rounded-lg p-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="font-semibold text-emerald-400">{fb.username}</span>
+                      <div className="flex items-center gap-1">
+                        {[...Array(fb.rating)].map((_, i) => (
+                          <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                        ))}
+                      </div>
+                    </div>
+                    <p className="text-gray-300">{fb.comment}</p>
+                  </div>
+                ))}
+              </div>
+            </Card>
+          )}
+        </div>
+      </Layout>
+    );
+  }
+
   const answeredCount = answers.filter(a => a !== null).length;
   const progressPercent = (answeredCount / (challenge.questions?.length || 1)) * 100;
 
