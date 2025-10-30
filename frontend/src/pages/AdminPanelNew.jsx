@@ -478,6 +478,212 @@ const AdminPanelNew = () => {
             )}
           </TabsContent>
 
+          {/* Quiz Questions Tab */}
+          <TabsContent value='quiz' className='space-y-4 mt-6'>
+            <div className='flex justify-between items-center mb-4'>
+              <h3 className='text-xl font-semibold'>Manajemen Quiz Questions</h3>
+              <Dialog open={showCreateQuizDialog} onOpenChange={setShowCreateQuizDialog}>
+                <DialogTrigger asChild>
+                  <Button className='bg-emerald-500 hover:bg-emerald-600'>
+                    <Plus className='w-4 h-4 mr-2' /> Create Question
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className='max-w-2xl max-h-[90vh] overflow-y-auto glass border-zinc-800'>
+                  <DialogHeader>
+                    <DialogTitle>Create Quiz Question</DialogTitle>
+                  </DialogHeader>
+                  <QuizQuestionForm 
+                    token={token} 
+                    onSuccess={() => { 
+                      setShowCreateQuizDialog(false); 
+                      fetchData(); 
+                    }} 
+                  />
+                </DialogContent>
+              </Dialog>
+            </div>
+            
+            <Card className='glass border-zinc-800 overflow-hidden'>
+              <div className='overflow-x-auto'>
+                <Table>
+                  <TableHeader>
+                    <TableRow className='border-zinc-800'>
+                      <TableHead>Question</TableHead>
+                      <TableHead>Category</TableHead>
+                      <TableHead>Difficulty</TableHead>
+                      <TableHead>Options</TableHead>
+                      <TableHead className='text-right'>Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {quizQuestions.map((quiz) => (
+                      <TableRow key={quiz.id} className='border-zinc-800'>
+                        <TableCell className='font-medium max-w-md truncate'>{quiz.question}</TableCell>
+                        <TableCell>
+                          <span className='px-2 py-1 rounded text-xs bg-cyan-500/20 text-cyan-400'>
+                            {quiz.category}
+                          </span>
+                        </TableCell>
+                        <TableCell>
+                          <span className={`px-2 py-1 rounded text-xs ${
+                            quiz.difficulty === 'beginner' ? 'bg-green-500/20 text-green-400' :
+                            quiz.difficulty === 'intermediate' ? 'bg-yellow-500/20 text-yellow-400' :
+                            'bg-red-500/20 text-red-400'
+                          }`}>
+                            {quiz.difficulty}
+                          </span>
+                        </TableCell>
+                        <TableCell className='text-sm text-gray-400'>{quiz.options?.length || 0} options</TableCell>
+                        <TableCell className='text-right space-x-2'>
+                          <Button
+                            variant='ghost'
+                            size='sm'
+                            onClick={() => setEditingQuiz(quiz)}
+                          >
+                            <Edit className='w-4 h-4' />
+                          </Button>
+                          <Button
+                            variant='ghost'
+                            size='sm'
+                            onClick={() => handleDeleteQuizQuestion(quiz.id)}
+                            className='text-red-400 hover:text-red-300'
+                          >
+                            <Trash2 className='w-4 h-4' />
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            </Card>
+
+            {editingQuiz && (
+              <Dialog open={!!editingQuiz} onOpenChange={() => setEditingQuiz(null)}>
+                <DialogContent className='max-w-2xl max-h-[90vh] overflow-y-auto glass border-zinc-800'>
+                  <DialogHeader>
+                    <DialogTitle>Edit Quiz Question</DialogTitle>
+                  </DialogHeader>
+                  <QuizQuestionForm 
+                    token={token} 
+                    questionData={editingQuiz}
+                    onSuccess={() => { 
+                      setEditingQuiz(null); 
+                      fetchData(); 
+                    }} 
+                  />
+                </DialogContent>
+              </Dialog>
+            )}
+          </TabsContent>
+
+          {/* Mini Game Scenarios Tab */}
+          <TabsContent value='minigame' className='space-y-4 mt-6'>
+            <div className='flex justify-between items-center mb-4'>
+              <h3 className='text-xl font-semibold'>Manajemen Mini Game Scenarios</h3>
+              <Dialog open={showCreateMiniGameDialog} onOpenChange={setShowCreateMiniGameDialog}>
+                <DialogTrigger asChild>
+                  <Button className='bg-emerald-500 hover:bg-emerald-600'>
+                    <Plus className='w-4 h-4 mr-2' /> Create Scenario
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className='max-w-2xl max-h-[90vh] overflow-y-auto glass border-zinc-800'>
+                  <DialogHeader>
+                    <DialogTitle>Create Mini Game Scenario</DialogTitle>
+                  </DialogHeader>
+                  <MiniGameScenarioForm 
+                    token={token} 
+                    onSuccess={() => { 
+                      setShowCreateMiniGameDialog(false); 
+                      fetchData(); 
+                    }} 
+                  />
+                </DialogContent>
+              </Dialog>
+            </div>
+            
+            <Card className='glass border-zinc-800 overflow-hidden'>
+              <div className='overflow-x-auto'>
+                <Table>
+                  <TableHeader>
+                    <TableRow className='border-zinc-800'>
+                      <TableHead>Title</TableHead>
+                      <TableHead>Game Type</TableHead>
+                      <TableHead>Difficulty</TableHead>
+                      <TableHead>Is Phishing?</TableHead>
+                      <TableHead>Indicators</TableHead>
+                      <TableHead className='text-right'>Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {miniGameScenarios.map((scenario) => (
+                      <TableRow key={scenario.id} className='border-zinc-800'>
+                        <TableCell className='font-medium max-w-md truncate'>{scenario.title}</TableCell>
+                        <TableCell>
+                          <span className='px-2 py-1 rounded text-xs bg-purple-500/20 text-purple-400'>
+                            {scenario.game_type}
+                          </span>
+                        </TableCell>
+                        <TableCell>
+                          <span className={`px-2 py-1 rounded text-xs ${
+                            scenario.difficulty === 'beginner' ? 'bg-green-500/20 text-green-400' :
+                            scenario.difficulty === 'intermediate' ? 'bg-yellow-500/20 text-yellow-400' :
+                            'bg-red-500/20 text-red-400'
+                          }`}>
+                            {scenario.difficulty}
+                          </span>
+                        </TableCell>
+                        <TableCell>
+                          {scenario.is_phishing ? (
+                            <span className='px-2 py-1 rounded text-xs bg-red-500/20 text-red-400'>Yes</span>
+                          ) : (
+                            <span className='px-2 py-1 rounded text-xs bg-green-500/20 text-green-400'>No</span>
+                          )}
+                        </TableCell>
+                        <TableCell className='text-sm text-gray-400'>{scenario.indicators?.length || 0} indicators</TableCell>
+                        <TableCell className='text-right space-x-2'>
+                          <Button
+                            variant='ghost'
+                            size='sm'
+                            onClick={() => setEditingMiniGame(scenario)}
+                          >
+                            <Edit className='w-4 h-4' />
+                          </Button>
+                          <Button
+                            variant='ghost'
+                            size='sm'
+                            onClick={() => handleDeleteMiniGameScenario(scenario.id)}
+                            className='text-red-400 hover:text-red-300'
+                          >
+                            <Trash2 className='w-4 h-4' />
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            </Card>
+
+            {editingMiniGame && (
+              <Dialog open={!!editingMiniGame} onOpenChange={() => setEditingMiniGame(null)}>
+                <DialogContent className='max-w-2xl max-h-[90vh] overflow-y-auto glass border-zinc-800'>
+                  <DialogHeader>
+                    <DialogTitle>Edit Mini Game Scenario</DialogTitle>
+                  </DialogHeader>
+                  <MiniGameScenarioForm 
+                    token={token} 
+                    scenarioData={editingMiniGame}
+                    onSuccess={() => { 
+                      setEditingMiniGame(null); 
+                      fetchData(); 
+                    }} 
+                  />
+                </DialogContent>
+              </Dialog>
+            )}
+          </TabsContent>
+
 
           {/* Users Tab */}
           <TabsContent value='users' className='space-y-4 mt-6'>
