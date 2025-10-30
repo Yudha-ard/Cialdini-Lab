@@ -120,6 +120,74 @@ const QuizMode = () => {
   };
 
   if (!started) {
+    // Show "Already Completed" screen if user has completed quiz before
+    if (alreadyCompleted && previousResult) {
+      return (
+        <Layout>
+          <div className="max-w-3xl mx-auto space-y-6">
+            <Card className="glass border-yellow-600/30 p-12 text-center">
+              <div className="w-24 h-24 rounded-full bg-yellow-500/10 flex items-center justify-center mx-auto mb-6">
+                <Target className="w-12 h-12 text-yellow-400" />
+              </div>
+              <h1 className="text-4xl font-bold mb-4">🏆 Quiz Sudah Diselesaikan!</h1>
+              <p className="text-gray-400 text-lg mb-8">
+                Kamu sudah menyelesaikan quiz ini sebelumnya.\nBerikut adalah hasil quiz kamu:
+              </p>
+              
+              <div className="grid md:grid-cols-3 gap-4 mb-8">
+                <div className="bg-zinc-900/50 rounded-lg p-6">
+                  <div className="text-4xl font-bold text-emerald-400 mb-2">
+                    {previousResult.correct_count}/{previousResult.total_questions}
+                  </div>
+                  <div className="text-gray-400">Correct</div>
+                </div>
+                <div className="bg-zinc-900/50 rounded-lg p-6">
+                  <div className="text-4xl font-bold text-yellow-400 mb-2">
+                    {previousResult.accuracy}%
+                  </div>
+                  <div className="text-gray-400">Accuracy</div>
+                </div>
+                <div className="bg-zinc-900/50 rounded-lg p-6">
+                  <div className="text-4xl font-bold text-purple-400 mb-2">
+                    +{previousResult.points_earned}
+                  </div>
+                  <div className="text-gray-400">Points Earned</div>
+                </div>
+              </div>
+
+              <div className="mb-6 p-4 bg-zinc-900/50 rounded-lg">
+                <p className="text-sm text-gray-400">
+                  Waktu Pengerjaan: {previousResult.time_taken_seconds} detik
+                </p>
+                <p className="text-xs text-gray-500 mt-2">
+                  Diselesaikan: {new Date(previousResult.completed_at).toLocaleDateString('id-ID', {
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                  })}
+                </p>
+              </div>
+
+              <div className="p-4 bg-yellow-900/20 border border-yellow-600/30 rounded-lg mb-6">
+                <p className="text-yellow-400 text-sm">
+                  ⚠️ Kamu hanya bisa mengikuti quiz sekali. Hasil di atas adalah skor final kamu.
+                </p>
+              </div>
+
+              <Button
+                onClick={() => navigate('/challenges')}
+                className="bg-emerald-600 hover:bg-emerald-700"
+              >
+                Kembali ke Challenges
+              </Button>
+            </Card>
+          </div>
+        </Layout>
+      );
+    }
+
     return (
       <Layout>
         <div className="max-w-3xl mx-auto space-y-6">
