@@ -1387,6 +1387,86 @@ const CourseForm = ({ token, courseData, onSuccess }) => {
         ))}
       </div>
 
+      {/* Quiz Questions Section */}
+      <div className='space-y-2 mt-6'>
+        <div className='flex justify-between items-center'>
+          <Label>Course Quiz Questions (Optional)</Label>
+          <Button type='button' onClick={addQuizQuestion} size='sm' variant='outline'>
+            <Plus className='w-4 h-4 mr-1' /> Add Quiz Question
+          </Button>
+        </div>
+        <p className='text-xs text-gray-500'>Add quiz questions untuk di-test di akhir course</p>
+        
+        <div className='space-y-2'>
+          <Label className='text-sm'>Passing Score (%)</Label>
+          <Input
+            type='number'
+            value={formData.passing_score || 70}
+            onChange={(e) => setFormData({ ...formData, passing_score: parseInt(e.target.value) })}
+            className='bg-zinc-900/50 border-zinc-800'
+            min={0}
+            max={100}
+          />
+        </div>
+
+        {formData.quiz_questions?.map((question, qIdx) => (
+          <Card key={qIdx} className='bg-zinc-900/50 border-zinc-800 p-4'>
+            <div className='flex justify-between items-start mb-3'>
+              <Label className='text-sm'>Question {qIdx + 1}</Label>
+              <Button type='button' onClick={() => removeQuizQuestion(qIdx)} size='sm' variant='ghost' className='text-red-400'>
+                <Trash2 className='w-4 h-4' />
+              </Button>
+            </div>
+
+            <div className='space-y-3'>
+              <Textarea
+                value={question.question}
+                onChange={(e) => updateQuizQuestion(qIdx, 'question', e.target.value)}
+                className='bg-zinc-900/50 border-zinc-800'
+                placeholder='Quiz question'
+                rows={2}
+                required={formData.quiz_questions.length > 0}
+              />
+
+              <div className='space-y-2'>
+                <Label className='text-xs text-gray-400'>Options</Label>
+                {question.options?.map((option, oIdx) => (
+                  <div key={oIdx} className='flex gap-2 items-center'>
+                    <input
+                      type='radio'
+                      name={`quiz-correct-${qIdx}`}
+                      checked={question.correct_answer === oIdx}
+                      onChange={() => updateQuizQuestion(qIdx, 'correct_answer', oIdx)}
+                      className='w-4 h-4'
+                    />
+                    <Input
+                      value={option}
+                      onChange={(e) => updateQuizOption(qIdx, oIdx, e.target.value)}
+                      className='bg-zinc-900/50 border-zinc-800'
+                      placeholder={`Option ${oIdx + 1}`}
+                      required={formData.quiz_questions.length > 0}
+                    />
+                  </div>
+                ))}
+                <p className='text-xs text-gray-500'>Select radio untuk mark correct answer</p>
+              </div>
+
+              <div>
+                <Label className='text-xs text-gray-400'>Explanation</Label>
+                <Textarea
+                  value={question.explanation}
+                  onChange={(e) => updateQuizQuestion(qIdx, 'explanation', e.target.value)}
+                  className='bg-zinc-900/50 border-zinc-800'
+                  placeholder='Explain why this is the correct answer'
+                  rows={2}
+                  required={formData.quiz_questions.length > 0}
+                />
+              </div>
+            </div>
+          </Card>
+        ))}
+      </div>
+
       <Button type='submit' className='w-full bg-emerald-600 hover:bg-emerald-700'>
         {courseData ? 'Update Course' : 'Create Course'}
       </Button>
