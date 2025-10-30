@@ -1069,6 +1069,18 @@ async def get_random_quiz():
 
 @api_router.post("/quiz/submit")
 async def submit_quiz(answers: dict, current_user: dict = Depends(get_current_user)):
+    # Check if user has already completed a quiz (GLOBAL restriction)
+    existing_completion = await db.quiz_completions.find_one(
+        {"user_id": current_user['id']},
+        {"_id": 0}
+    )
+    
+    if existing_completion:
+        raise HTTPException(
+            status_code=400, 
+            detail="Quiz sudah pernah diselesaikan. Kamu hanya bisa mengikuti quiz sekali."
+        )
+    
     user_answers = answers.get('answers', [])
     quiz_questions = answers.get('questions', [])
     time_taken = answers.get('time_taken', 60)
@@ -1088,12 +1100,295 @@ async def submit_quiz(answers: dict, current_user: dict = Depends(get_current_us
         {"$set": {"points": new_points}}
     )
     
+    # Record completion
+    completion_data = {
+        "user_id": current_user['id'],
+        "quiz_data": {
+            "questions": quiz_questions,
+            "answers": user_answers
+        },
+        "correct_count": correct,
+        "total_questions": total,
+        "points_earned": points,
+        "time_taken_seconds": time_taken,
+        "accuracy": round((correct / total) * 100, 1),
+        "completed_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    await db.quiz_completions.insert_one(completion_data)
+    
     return {
         "correct": correct,
         "total": total,
         "points_earned": points,
         "accuracy": round((correct / total) * 100, 1)
     }
+
+# ===== QUIZ COMPLETION STATUS =====
+@api_router.get("/quiz/completion-status")
+async def get_quiz_completion_status(current_user: dict = Depends(get_current_user)):
+    """Check if user has completed any quiz (GLOBAL restriction)"""
+    completion = await db.quiz_completions.find_one(
+        {"user_id": current_user['id']},
+        {"_id": 0}
+    )
+    
+    if completion:
+        return {
+            "completed": True,
+            "completion_data": {
+                "correct_count": completion['correct_count'],
+                "total_questions": completion['total_questions'],
+                "points_earned": completion['points_earned'],
+                "accuracy": completion['accuracy'],
+                "time_taken_seconds": completion['time_taken_seconds'],
+                "completed_at": completion['completed_at']
+            }
+        }
+    
+    return {"completed": False}
+
+# ===== MINI GAME ENDPOINTS =====
+@api_router.get("/minigame/completion-status/{game_type}")
+async def get_minigame_completion_status(game_type: str, current_user: dict = Depends(get_current_user)):
+    """Check if user has completed a specific mini game"""
+    completion = await db.minigame_completions.find_one(
+        {"user_id": current_user['id'], "game_type": game_type},
+        {"_id": 0}
+    )
+    
+    if completion:
+        return {
+            "completed": True,
+            "completion_data": {
+                "score": completion['score'],
+                "time_taken_seconds": completion['time_taken_seconds'],
+                "details": completion.get('details', {}),
+                "completed_at": completion['completed_at']
+            }
+        }
+    
+    return {"completed": False}
+
+@api_router.post("/minigame/complete")
+async def complete_minigame(data: dict, current_user: dict = Depends(get_current_user)):
+    """Record mini game completion"""
+    game_type = data.get('game_type')
+    score = data.get('score', 0)
+    time_taken = data.get('time_taken_seconds', 0)
+    details = data.get('details', {})
+    
+    # Check if already completed
+    existing = await db.minigame_completions.find_one(
+        {"user_id": current_user['id'], "game_type": game_type}
+    )
+    
+    if existing:
+        raise HTTPException(
+            status_code=400,
+            detail="Mini game ini sudah pernah diselesaikan. Kamu hanya bisa bermain sekali."
+        )
+    
+    completion_data = {
+        "user_id": current_user['id'],
+        "game_type": game_type,
+        "score": score,
+        "time_taken_seconds": time_taken,
+        "details": details,
+        "completed_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    await db.minigame_completions.insert_one(completion_data)
+    
+    # Award points
+    points_earned = score
+    new_points = current_user.get('points', 0) + points_earned
+    await db.users.update_one(
+        {"id": current_user['id']},
+        {"$set": {"points": new_points}}
+    )
+    
+    return {
+        "success": True,
+        "points_earned": points_earned,
+        "message": "Mini game berhasil diselesaikan!"
+    }
+
+# ===== CHALLENGE COMPLETION STATUS =====
+@api_router.get("/challenges/{challenge_id}/completion")
+async def get_challenge_completion_status(challenge_id: str, current_user: dict = Depends(get_current_user)):
+    """Check if user has completed a specific challenge"""
+    attempt = await db.challenge_attempts.find_one(
+        {"user_id": current_user['id'], "challenge_id": challenge_id, "is_completed": True},
+        {"_id": 0}
+    )
+    
+    if attempt:
+        return {
+            "completed": True,
+            "completion_data": {
+                "correct_count": attempt['correct_count'],
+                "total_questions": attempt['total_questions'],
+                "points_earned": attempt['points_earned'],
+                "time_taken_seconds": attempt.get('time_taken_seconds'),
+                "completed_at": attempt['timestamp']
+            }
+        }
+    
+    return {"completed": False}
+
+# ===== ADMIN: RESET COMPLETION STATUS =====
+@api_router.post("/admin/reset-completion")
+async def reset_user_completion(data: dict, admin_user: dict = Depends(require_admin)):
+    """Admin endpoint to reset user completion status"""
+    user_id = data.get('user_id')
+    completion_type = data.get('type')  # quiz, minigame, challenge
+    specific_id = data.get('specific_id')  # For challenge_id or game_type
+    
+    if not user_id or not completion_type:
+        raise HTTPException(status_code=400, detail="user_id and type are required")
+    
+    deleted_count = 0
+    
+    if completion_type == "quiz":
+        result = await db.quiz_completions.delete_many({"user_id": user_id})
+        deleted_count = result.deleted_count
+    
+    elif completion_type == "minigame":
+        query = {"user_id": user_id}
+        if specific_id:
+            query["game_type"] = specific_id
+        result = await db.minigame_completions.delete_many(query)
+        deleted_count = result.deleted_count
+    
+    elif completion_type == "challenge":
+        query = {"user_id": user_id}
+        if specific_id:
+            query["challenge_id"] = specific_id
+        result = await db.challenge_attempts.delete_many(query)
+        deleted_count = result.deleted_count
+        
+        # Also remove from user's completed_challenges
+        if specific_id:
+            await db.users.update_one(
+                {"id": user_id},
+                {"$pull": {"completed_challenges": specific_id}}
+            )
+        else:
+            await db.users.update_one(
+                {"id": user_id},
+                {"$set": {"completed_challenges": []}}
+            )
+    
+    else:
+        raise HTTPException(status_code=400, detail="Invalid type. Must be: quiz, minigame, or challenge")
+    
+    return {
+        "success": True,
+        "message": f"Reset {deleted_count} completion record(s)",
+        "deleted_count": deleted_count
+    }
+
+# ===== ADMIN: QUIZ QUESTIONS CRUD =====
+@api_router.get("/admin/quiz-questions")
+async def get_all_quiz_questions(admin_user: dict = Depends(require_admin)):
+    """Get all quiz questions for admin management"""
+    questions = await db.quiz_questions.find({}, {"_id": 0}).to_list(1000)
+    return questions
+
+@api_router.post("/admin/quiz-questions")
+async def create_quiz_question(question: dict, admin_user: dict = Depends(require_admin)):
+    """Create a new quiz question"""
+    question_data = {
+        "id": str(uuid.uuid4()),
+        "question": question.get('question'),
+        "options": question.get('options', []),
+        "correct_answer": question.get('correct_answer'),
+        "explanation": question.get('explanation', ''),
+        "category": question.get('category', 'general'),
+        "difficulty": question.get('difficulty', 'beginner'),
+        "created_by": admin_user['username'],
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    await db.quiz_questions.insert_one(question_data)
+    return {"success": True, "question_id": question_data['id']}
+
+@api_router.put("/admin/quiz-questions/{question_id}")
+async def update_quiz_question(question_id: str, question: dict, admin_user: dict = Depends(require_admin)):
+    """Update a quiz question"""
+    update_data = {k: v for k, v in question.items() if k != 'id'}
+    
+    result = await db.quiz_questions.update_one(
+        {"id": question_id},
+        {"$set": update_data}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Question not found")
+    
+    return {"success": True}
+
+@api_router.delete("/admin/quiz-questions/{question_id}")
+async def delete_quiz_question(question_id: str, admin_user: dict = Depends(require_admin)):
+    """Delete a quiz question"""
+    result = await db.quiz_questions.delete_one({"id": question_id})
+    
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Question not found")
+    
+    return {"success": True}
+
+# ===== ADMIN: MINI GAME SCENARIOS CRUD =====
+@api_router.get("/admin/minigame-scenarios")
+async def get_all_minigame_scenarios(admin_user: dict = Depends(require_admin)):
+    """Get all mini game scenarios for admin management"""
+    scenarios = await db.minigame_scenarios.find({}, {"_id": 0}).to_list(1000)
+    return scenarios
+
+@api_router.post("/admin/minigame-scenarios")
+async def create_minigame_scenario(scenario: dict, admin_user: dict = Depends(require_admin)):
+    """Create a new mini game scenario"""
+    scenario_data = {
+        "id": str(uuid.uuid4()),
+        "game_type": scenario.get('game_type', 'spot_the_phishing'),
+        "title": scenario.get('title'),
+        "description": scenario.get('description', ''),
+        "image_url": scenario.get('image_url', ''),
+        "is_phishing": scenario.get('is_phishing', False),
+        "indicators": scenario.get('indicators', []),
+        "difficulty": scenario.get('difficulty', 'beginner'),
+        "created_by": admin_user['username'],
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    await db.minigame_scenarios.insert_one(scenario_data)
+    return {"success": True, "scenario_id": scenario_data['id']}
+
+@api_router.put("/admin/minigame-scenarios/{scenario_id}")
+async def update_minigame_scenario(scenario_id: str, scenario: dict, admin_user: dict = Depends(require_admin)):
+    """Update a mini game scenario"""
+    update_data = {k: v for k, v in scenario.items() if k != 'id'}
+    
+    result = await db.minigame_scenarios.update_one(
+        {"id": scenario_id},
+        {"$set": update_data}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Scenario not found")
+    
+    return {"success": True}
+
+@api_router.delete("/admin/minigame-scenarios/{scenario_id}")
+async def delete_minigame_scenario(scenario_id: str, admin_user: dict = Depends(require_admin)):
+    """Delete a mini game scenario"""
+    result = await db.minigame_scenarios.delete_one({"id": scenario_id})
+    
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Scenario not found")
+    
+    return {"success": True}
 
 app.include_router(api_router)
 
