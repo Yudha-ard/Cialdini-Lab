@@ -60,6 +60,11 @@ const CourseViewer = () => {
     } else if (currentModuleIndex < course.modules.length - 1) {
       setCurrentModuleIndex(currentModuleIndex + 1);
       setCurrentSlideIndex(0);
+    } else {
+      // Reached end of course, show quiz if available
+      if (course.quiz_questions && course.quiz_questions.length > 0 && !progress?.quiz_completed) {
+        setShowQuiz(true);
+      }
     }
   };
 
@@ -70,6 +75,36 @@ const CourseViewer = () => {
       setCurrentModuleIndex(currentModuleIndex - 1);
       const prevModule = course.modules[currentModuleIndex - 1];
       setCurrentSlideIndex(prevModule.slides.length - 1);
+    }
+  };
+
+  const handleQuizAnswer = (questionIndex, answerIndex) => {
+    const newAnswers = [...quizAnswers];
+    newAnswers[questionIndex] = answerIndex;
+    setQuizAnswers(newAnswers);
+  };
+
+  const submitQuiz = async () => {
+    if (quizAnswers.some(a => a === null)) {
+      toast.error('Jawab semua pertanyaan terlebih dahulu');
+      return;
+    }
+
+    try {
+      const response = await axios.post(
+        `${API}/courses/${id}/submit-quiz`,
+        { answers: quizAnswers },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setQuizResult(response.data);
+      if (response.data.passed) {
+        toast.success('Selamat! Kamu lulus quiz dan mendapat certificate! 🎉');
+      } else {
+        toast.error(`Skor kamu ${response.data.score}%. Minimal ${response.data.passing_score}% untuk lulus.`);
+      }
+      fetchProgress();
+    } catch (error) {
+      toast.error('Gagal submit quiz');
     }
   };
 
