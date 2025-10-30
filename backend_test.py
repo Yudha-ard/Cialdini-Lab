@@ -1,18 +1,22 @@
 #!/usr/bin/env python3
 """
-Backend API Testing for Course CRUD Endpoints
-Testing the Course management system with comprehensive scenarios
+Backend API Testing for Single-Play Restriction System
+Testing Quiz, Mini Games, Challenges, and Admin CRUD endpoints
 """
 
 import requests
 import json
 import sys
+import uuid
 from datetime import datetime
 
 # Configuration
 BASE_URL = "https://securitytrainer-5.preview.emergentagent.com/api"
 ADMIN_USERNAME = "admin"
 ADMIN_PASSWORD = "admin123"
+TEST_USER_USERNAME = f"testuser_{str(uuid.uuid4())[:8]}"
+TEST_USER_EMAIL = f"test_{str(uuid.uuid4())[:8]}@example.com"
+TEST_USER_PASSWORD = "testpass123"
 
 class CourseAPITester:
     def __init__(self):
