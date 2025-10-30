@@ -56,6 +56,8 @@ const AdminPanelNew = () => {
       setCourses(coursesRes.data);
       setEducation(educationRes.data);
       setUsers(usersRes.data);
+      setQuizQuestions(quizRes.data);
+      setMiniGameScenarios(miniGameRes.data);
     } catch (error) {
       toast.error('Gagal load data admin');
     } finally {
