@@ -28,11 +28,29 @@ const ChallengeDetailNew = () => {
   const [feedbacks, setFeedbacks] = useState([]);
   const [showFeedbackForm, setShowFeedbackForm] = useState(false);
   const [feedbackData, setFeedbackData] = useState({ rating: 5, comment: '' });
+  const [alreadyCompleted, setAlreadyCompleted] = useState(false);
+  const [previousResult, setPreviousResult] = useState(null);
 
   useEffect(() => {
+    checkCompletionStatus();
     fetchChallenge();
     fetchFeedbacks();
   }, [id]);
+
+  const checkCompletionStatus = async () => {
+    try {
+      const response = await axios.get(`${API}/challenges/${id}/completion`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      if (response.data.completed) {
+        setAlreadyCompleted(true);
+        setPreviousResult(response.data.completion_data);
+      }
+    } catch (error) {
+      console.error('Failed to check completion status:', error);
+    }
+  };
 
   useEffect(() => {
     if (challenge && !startTime) {
