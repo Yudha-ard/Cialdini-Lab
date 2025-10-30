@@ -397,8 +397,12 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Course CRUD API endpoints"
-    - "AdminPanel Course Tab dan CRUD UI"
+    - "Single-play restriction: Quiz completion tracking"
+    - "Single-play restriction: Mini Game completion tracking"
+    - "Single-play restriction: Challenge completion tracking"
+    - "Admin: Reset completion status"
+    - "Admin CRUD: Quiz Questions"
+    - "Admin CRUD: Mini Game Scenarios"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
@@ -406,108 +410,111 @@ test_plan:
 agent_communication:
   - agent: "main"
     message: |
-      IMPLEMENTASI COURSE CRUD SELESAI - SIAP UNTUK BACKEND TESTING
+      BACKEND IMPLEMENTATION COMPLETED - READY FOR COMPREHENSIVE TESTING
       
-      Saya telah mengimplementasikan fitur Course CRUD di AdminPanel:
+      Saya telah mengimplementasikan semua fitur single-play restriction:
       
-      BACKEND (Already exists):
-      - Course model dengan modules dan slides structure
-      - API endpoints untuk CRUD operations
-      - Admin authorization untuk create/update/delete
+      NEW BACKEND FEATURES:
       
-      FRONTEND (Newly implemented):
-      - Tab "Courses" baru di AdminPanel
-      - CourseForm component dengan nested structure untuk modules dan slides
-      - Full CRUD UI dengan create, edit, delete functionality
-      - Dynamic add/remove untuk prerequisites, learning outcomes, modules, dan slides
+      1. QUIZ COMPLETION TRACKING (GLOBAL):
+         - Modified POST /api/quiz/submit - checks for existing completion before allowing submission
+         - Added QuizCompletion model and quiz_completions collection
+         - Added GET /api/quiz/completion-status - returns completion data if completed
+         - GLOBAL restriction: once any quiz is completed, all quizzes are locked
+      
+      2. MINI GAME COMPLETION TRACKING:
+         - Added MiniGameCompletion model and minigame_completions collection
+         - Added GET /api/minigame/completion-status/{game_type} - check if specific game completed
+         - Added POST /api/minigame/complete - record completion and award points
+         - Single-play per game type
+      
+      3. CHALLENGE COMPLETION TRACKING:
+         - Modified POST /api/challenges/{challenge_id}/attempt - prevents replay of completed challenges
+         - Returns 400 with previous results if trying to replay
+         - Added GET /api/challenges/{challenge_id}/completion - check completion status
+         - Fixed collection name bug (db.attempts → db.challenge_attempts)
+      
+      4. ADMIN RESET FUNCTIONALITY:
+         - Added POST /api/admin/reset-completion endpoint
+         - Can reset quiz, minigame, or challenge completions
+         - Parameters: user_id, type (quiz/minigame/challenge), specific_id (optional)
+         - Updates user's completed_challenges array for challenges
+      
+      5. ADMIN CRUD - QUIZ QUESTIONS:
+         - Added QuizQuestion model
+         - GET /api/admin/quiz-questions - list all
+         - POST /api/admin/quiz-questions - create
+         - PUT /api/admin/quiz-questions/{question_id} - update
+         - DELETE /api/admin/quiz-questions/{question_id} - delete
+      
+      6. ADMIN CRUD - MINI GAME SCENARIOS:
+         - Added MiniGameScenario model
+         - GET /api/admin/minigame-scenarios - list all
+         - POST /api/admin/minigame-scenarios - create
+         - PUT /api/admin/minigame-scenarios/{scenario_id} - update
+         - DELETE /api/admin/minigame-scenarios/{scenario_id} - delete
       
       REQUEST FOR BACKEND TESTING:
-      Mohon test backend API endpoints untuk Course CRUD:
+      Mohon test semua endpoint baru dengan skenario lengkap:
       
-      1. Test Credentials:
-         - Admin user: username=admin, password=admin123
-         - Backend URL: https://securitytrainer-5.preview.emergentagent.com/api
+      Test Credentials:
+      - Admin: username=admin, password=admin123
+      - Regular User: username=testuser, password=test123 (atau buat user baru)
+      - Backend URL: Gunakan REACT_APP_BACKEND_URL dari frontend/.env
       
-      2. Test Scenarios (PRIORITY HIGH):
-         a. GET /api/courses - Fetch all courses
-         b. POST /api/admin/courses - Create new course dengan modules & slides
-            Sample payload:
-            {
-              "title": "Test Course Social Engineering",
-              "description": "Course untuk testing CRUD",
-              "category": "social_engineering",
-              "difficulty": "beginner",
-              "total_duration_minutes": 60,
-              "prerequisites": ["Basic Security Knowledge"],
-              "learning_outcomes": ["Understand SE basics", "Identify threats"],
-              "modules": [{
-                "module_number": 1,
-                "title": "Introduction",
-                "description": "Intro module",
-                "slides": [{
-                  "title": "Welcome",
-                  "content": "Welcome to the course",
-                  "code_example": "",
-                  "image_url": ""
-                }]
-              }],
-              "created_by": "admin"
-            }
-         c. PUT /api/admin/courses/{course_id} - Update existing course
-         d. DELETE /api/admin/courses/{course_id} - Delete course
-         e. GET /api/courses/{course_id} - Get single course detail
+      PRIORITY TEST SCENARIOS:
       
-      3. Edge Cases to Test:
-         - Create course tanpa modules (empty array)
-         - Create course dengan multiple modules (2-3 modules)
-         - Update course - add new module
-         - Update course - remove existing module
-         - Delete course yang tidak exist (404 expected)
-         - Authorization - test tanpa token (403 expected)
+      A. QUIZ COMPLETION:
+         1. Login as regular user
+         2. GET /api/quiz/completion-status - should return completed: false
+         3. GET /api/quiz/random - get quiz questions
+         4. POST /api/quiz/submit - submit answers (first time should work)
+         5. GET /api/quiz/completion-status - should return completed: true with data
+         6. POST /api/quiz/submit - attempt again (should fail with 400)
+         7. Admin reset: POST /api/admin/reset-completion with {"user_id": "...", "type": "quiz"}
+         8. Verify user can take quiz again after reset
       
-      4. Validation to Check:
-         - Required fields (title, description, category, difficulty)
-         - Module numbering consistency
-         - Created_by field population
-         - DateTime serialization
+      B. MINI GAME COMPLETION:
+         1. Login as regular user
+         2. GET /api/minigame/completion-status/spot_the_phishing - should return completed: false
+         3. POST /api/minigame/complete with game data (should work first time)
+         4. GET /api/minigame/completion-status/spot_the_phishing - should return completed: true
+         5. POST /api/minigame/complete again (should fail with 400)
+         6. Admin reset: POST /api/admin/reset-completion with {"user_id": "...", "type": "minigame", "specific_id": "spot_the_phishing"}
+         7. Verify user can play again after reset
       
-      SETELAH BACKEND TESTING:
-      - Jika backend OK, akan dilanjutkan dengan frontend E2E testing
-      - Jika ada issue, akan diperbaiki terlebih dahulu
+      C. CHALLENGE COMPLETION:
+         1. Login as regular user
+         2. GET /api/challenges - get list of challenges
+         3. Pick one challenge, GET /api/challenges/{id}/completion - should return completed: false
+         4. POST /api/challenges/{id}/attempt - submit answers (should work first time)
+         5. GET /api/challenges/{id}/completion - should return completed: true
+         6. POST /api/challenges/{id}/attempt again (should fail with 400 and return previous results)
+         7. Admin reset: POST /api/admin/reset-completion with {"user_id": "...", "type": "challenge", "specific_id": "{challenge_id}"}
+         8. Verify user can attempt challenge again
       
-      Status aplikasi saat ini:
-      - Frontend: Compiled successfully
-      - Backend: Running
-      - Login page: Accessible
-  - agent: "testing"
-    message: |
-      BACKEND TESTING COMPLETED SUCCESSFULLY ✅
+      D. ADMIN QUIZ QUESTIONS CRUD:
+         1. Login as admin
+         2. GET /api/admin/quiz-questions - list all
+         3. POST /api/admin/quiz-questions - create new question with full data
+         4. PUT /api/admin/quiz-questions/{id} - update question
+         5. DELETE /api/admin/quiz-questions/{id} - delete question
+         6. Test without admin token (should return 403)
       
-      SUMMARY:
-      All Course CRUD API endpoints are working perfectly. I found and fixed one critical bug during testing.
+      E. ADMIN MINI GAME SCENARIOS CRUD:
+         1. Login as admin
+         2. GET /api/admin/minigame-scenarios - list all
+         3. POST /api/admin/minigame-scenarios - create new scenario
+         4. PUT /api/admin/minigame-scenarios/{id} - update scenario
+         5. DELETE /api/admin/minigame-scenarios/{id} - delete scenario
+         6. Test without admin token (should return 403)
       
-      ISSUE FOUND & FIXED:
-      - The PUT /api/admin/courses/{course_id} endpoint had a bug where it was overwriting the course ID
-      - This caused courses to disappear after updates because new UUIDs were generated
-      - Fixed by excluding the 'id' field from the update payload in server.py line 789
+      EDGE CASES TO TEST:
+      - Non-existent IDs (should return 404)
+      - Invalid payloads (missing required fields)
+      - Unauthorized access (non-admin trying admin endpoints)
+      - Reset non-existent completions
+      - Multiple completion attempts in rapid succession
       
-      COMPREHENSIVE TEST RESULTS:
-      ✅ Authentication with admin credentials
-      ✅ GET /api/courses - Lists all courses with proper structure
-      ✅ POST /api/admin/courses - Creates courses with complex nested modules & slides
-      ✅ GET /api/courses/{id} - Retrieves single course with full data
-      ✅ PUT /api/admin/courses/{id} - Updates courses including adding new modules
-      ✅ DELETE /api/admin/courses/{id} - Properly removes courses
-      ✅ Authorization protection - Rejects unauthorized requests with 403
-      ✅ Error handling - Returns 404 for non-existent courses
-      ✅ Edge cases - Handles empty modules, multiple modules, complex structures
-      
-      VALIDATION CONFIRMED:
-      ✅ All required fields present in responses
-      ✅ Module and slide structure integrity maintained
-      ✅ DateTime serialization working correctly
-      ✅ Course ID preservation during updates
-      ✅ Admin authorization working properly
-      
-      READY FOR NEXT PHASE:
-      The backend Course CRUD system is fully functional and ready for frontend integration testing.
+      Backend server status: Running successfully
+      All endpoints are authenticated and ready for testing
