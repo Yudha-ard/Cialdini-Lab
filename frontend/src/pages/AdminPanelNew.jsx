@@ -107,6 +107,34 @@ const AdminPanelNew = () => {
     }
   };
 
+  const handleDeleteQuizQuestion = async (questionId) => {
+    if (!confirm('Yakin ingin menghapus quiz question ini?')) return;
+    
+    try {
+      await axios.delete(`${API}/admin/quiz-questions/${questionId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      toast.success('Quiz question berhasil dihapus');
+      fetchData();
+    } catch (error) {
+      toast.error('Gagal menghapus quiz question');
+    }
+  };
+
+  const handleDeleteMiniGameScenario = async (scenarioId) => {
+    if (!confirm('Yakin ingin menghapus mini game scenario ini?')) return;
+    
+    try {
+      await axios.delete(`${API}/admin/minigame-scenarios/${scenarioId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      toast.success('Mini game scenario berhasil dihapus');
+      fetchData();
+    } catch (error) {
+      toast.error('Gagal menghapus mini game scenario');
+    }
+  };
+
   const handleDeleteUser = async (userId) => {
     if (!confirm('Yakin ingin menghapus user ini?')) return;
     
