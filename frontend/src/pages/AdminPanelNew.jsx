@@ -1139,6 +1139,40 @@ const CourseForm = ({ token, courseData, onSuccess }) => {
     });
   };
 
+  const addQuizQuestion = () => {
+    setFormData({
+      ...formData,
+      quiz_questions: [
+        ...formData.quiz_questions,
+        {
+          question: '',
+          options: ['', '', '', ''],
+          correct_answer: 0,
+          explanation: ''
+        }
+      ]
+    });
+  };
+
+  const updateQuizQuestion = (index, field, value) => {
+    const newQuestions = [...formData.quiz_questions];
+    newQuestions[index][field] = value;
+    setFormData({ ...formData, quiz_questions: newQuestions });
+  };
+
+  const updateQuizOption = (qIndex, oIndex, value) => {
+    const newQuestions = [...formData.quiz_questions];
+    newQuestions[qIndex].options[oIndex] = value;
+    setFormData({ ...formData, quiz_questions: newQuestions });
+  };
+
+  const removeQuizQuestion = (index) => {
+    setFormData({
+      ...formData,
+      quiz_questions: formData.quiz_questions.filter((_, i) => i !== index)
+    });
+  };
+
   return (
     <form onSubmit={handleSubmit} className='space-y-6'>
       {/* Basic Info */}
