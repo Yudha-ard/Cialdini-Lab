@@ -191,6 +191,53 @@ class Certificate(BaseModel):
     issued_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     certificate_code: str = Field(default_factory=lambda: str(uuid.uuid4())[:8].upper())
 
+class QuizCompletion(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str
+    quiz_data: dict  # Store the quiz questions and answers
+    correct_count: int
+    total_questions: int
+    points_earned: int
+    time_taken_seconds: int
+    accuracy: float
+    completed_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class MiniGameCompletion(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str
+    game_type: str  # spot_the_phishing, etc
+    score: int
+    time_taken_seconds: int
+    details: dict  # Store game-specific data
+    completed_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class QuizQuestion(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    question: str
+    options: List[str]
+    correct_answer: int
+    explanation: str
+    category: str
+    difficulty: str
+    created_by: str
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class MiniGameScenario(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    game_type: str  # spot_the_phishing
+    title: str
+    description: str
+    image_url: str
+    is_phishing: bool
+    indicators: List[str]
+    difficulty: str
+    created_by: str
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
 # ===== AUTH HELPERS =====
 def hash_password(password: str) -> str:
     return pwd_context.hash(password)
