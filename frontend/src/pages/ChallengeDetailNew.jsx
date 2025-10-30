@@ -111,7 +111,16 @@ const ChallengeDetailNew = () => {
       }
     } catch (error) {
       console.error('Failed to submit answer:', error);
-      toast.error('Gagal submit jawaban');
+      if (error.response?.status === 400 && error.response?.data?.detail?.message) {
+        // Challenge already completed
+        toast.error(error.response.data.detail.message);
+        if (error.response.data.detail.previous_result) {
+          setPreviousResult(error.response.data.detail.previous_result);
+          setAlreadyCompleted(true);
+        }
+      } else {
+        toast.error('Gagal submit jawaban');
+      }
     } finally {
       setSubmitting(false);
     }
