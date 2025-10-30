@@ -1570,4 +1570,291 @@ const ChallengeForm = ({ token, challenge, onSuccess }) => {
   );
 };
 
+
+// Quiz Question Form Component
+const QuizQuestionForm = ({ token, questionData, onSuccess }) => {
+  const [formData, setFormData] = useState(questionData || {
+    question: '',
+    options: ['', '', '', ''],
+    correct_answer: 0,
+    explanation: '',
+    category: 'general',
+    difficulty: 'beginner'
+  });
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const url = questionData 
+        ? `${API}/admin/quiz-questions/${questionData.id}`
+        : `${API}/admin/quiz-questions`;
+      const method = questionData ? 'put' : 'post';
+      
+      await axios[method](url, formData, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      toast.success(`Quiz question berhasil ${questionData ? 'diupdate' : 'dibuat'}`);
+      onSuccess();
+    } catch (error) {
+      toast.error(`Gagal ${questionData ? 'update' : 'create'} quiz question`);
+    }
+  };
+
+  const handleOptionChange = (index, value) => {
+    const newOptions = [...formData.options];
+    newOptions[index] = value;
+    setFormData({ ...formData, options: newOptions });
+  };
+
+  const addOption = () => {
+    setFormData({ ...formData, options: [...formData.options, ''] });
+  };
+
+  const removeOption = (index) => {
+    const newOptions = formData.options.filter((_, i) => i !== index);
+    setFormData({ ...formData, options: newOptions });
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className='space-y-4'>
+      <div className='space-y-2'>
+        <Label>Question</Label>
+        <Textarea
+          placeholder='Enter question text'
+          value={formData.question}
+          onChange={(e) => setFormData({ ...formData, question: e.target.value })}
+          className='min-h-[100px]'
+          required
+        />
+      </div>
+
+      <div className='grid grid-cols-2 gap-4'>
+        <div className='space-y-2'>
+          <Label>Category</Label>
+          <select
+            value={formData.category}
+            onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+            className='w-full px-3 py-2 bg-zinc-900/50 border border-zinc-800 rounded-md'
+            required
+          >
+            <option value='general'>General</option>
+            <option value='phishing'>Phishing</option>
+            <option value='social_engineering'>Social Engineering</option>
+            <option value='security'>Security</option>
+          </select>
+        </div>
+
+        <div className='space-y-2'>
+          <Label>Difficulty</Label>
+          <select
+            value={formData.difficulty}
+            onChange={(e) => setFormData({ ...formData, difficulty: e.target.value })}
+            className='w-full px-3 py-2 bg-zinc-900/50 border border-zinc-800 rounded-md'
+            required
+          >
+            <option value='beginner'>Beginner</option>
+            <option value='intermediate'>Intermediate</option>
+            <option value='advanced'>Advanced</option>
+          </select>
+        </div>
+      </div>
+
+      <div className='space-y-2'>
+        <div className='flex justify-between items-center'>
+          <Label>Options</Label>
+          <Button type='button' size='sm' onClick={addOption} variant='ghost'>
+            <Plus className='w-4 h-4 mr-1' /> Add Option
+          </Button>
+        </div>
+        {formData.options.map((option, index) => (
+          <div key={index} className='flex gap-2 items-center'>
+            <Input
+              placeholder={`Option ${index + 1}`}
+              value={option}
+              onChange={(e) => handleOptionChange(index, e.target.value)}
+              required
+            />
+            <input
+              type='radio'
+              name='correct_answer'
+              checked={formData.correct_answer === index}
+              onChange={() => setFormData({ ...formData, correct_answer: index })}
+              className='w-4 h-4'
+            />
+            {formData.options.length > 2 && (
+              <Button type='button' size='sm' variant='ghost' onClick={() => removeOption(index)}>
+                <Trash2 className='w-4 h-4' />
+              </Button>
+            )}
+          </div>
+        ))}
+        <p className='text-xs text-gray-500'>Select radio button to mark correct answer</p>
+      </div>
+
+      <div className='space-y-2'>
+        <Label>Explanation</Label>
+        <Textarea
+          placeholder='Explain the correct answer'
+          value={formData.explanation}
+          onChange={(e) => setFormData({ ...formData, explanation: e.target.value })}
+          className='min-h-[80px]'
+          required
+        />
+      </div>
+
+      <Button type='submit' className='w-full bg-emerald-600 hover:bg-emerald-700'>
+        {questionData ? 'Update Question' : 'Create Question'}
+      </Button>
+    </form>
+  );
+};
+
+// Mini Game Scenario Form Component
+const MiniGameScenarioForm = ({ token, scenarioData, onSuccess }) => {
+  const [formData, setFormData] = useState(scenarioData || {
+    game_type: 'spot_the_phishing',
+    title: '',
+    description: '',
+    image_url: '',
+    is_phishing: false,
+    indicators: [''],
+    difficulty: 'beginner'
+  });
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const url = scenarioData 
+        ? `${API}/admin/minigame-scenarios/${scenarioData.id}`
+        : `${API}/admin/minigame-scenarios`;
+      const method = scenarioData ? 'put' : 'post';
+      
+      await axios[method](url, formData, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      toast.success(`Mini game scenario berhasil ${scenarioData ? 'diupdate' : 'dibuat'}`);
+      onSuccess();
+    } catch (error) {
+      toast.error(`Gagal ${scenarioData ? 'update' : 'create'} mini game scenario`);
+    }
+  };
+
+  const handleIndicatorChange = (index, value) => {
+    const newIndicators = [...formData.indicators];
+    newIndicators[index] = value;
+    setFormData({ ...formData, indicators: newIndicators });
+  };
+
+  const addIndicator = () => {
+    setFormData({ ...formData, indicators: [...formData.indicators, ''] });
+  };
+
+  const removeIndicator = (index) => {
+    const newIndicators = formData.indicators.filter((_, i) => i !== index);
+    setFormData({ ...formData, indicators: newIndicators });
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className='space-y-4'>
+      <div className='space-y-2'>
+        <Label>Game Type</Label>
+        <select
+          value={formData.game_type}
+          onChange={(e) => setFormData({ ...formData, game_type: e.target.value })}
+          className='w-full px-3 py-2 bg-zinc-900/50 border border-zinc-800 rounded-md'
+          required
+        >
+          <option value='spot_the_phishing'>Spot the Phishing</option>
+        </select>
+      </div>
+
+      <div className='space-y-2'>
+        <Label>Title</Label>
+        <Input
+          placeholder='Enter scenario title'
+          value={formData.title}
+          onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+          required
+        />
+      </div>
+
+      <div className='space-y-2'>
+        <Label>Description</Label>
+        <Textarea
+          placeholder='Enter scenario description'
+          value={formData.description}
+          onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+          className='min-h-[80px]'
+          required
+        />
+      </div>
+
+      <div className='space-y-2'>
+        <Label>Image URL</Label>
+        <Input
+          placeholder='Enter image URL'
+          value={formData.image_url}
+          onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
+        />
+      </div>
+
+      <div className='flex items-center space-x-2'>
+        <input
+          type='checkbox'
+          id='is_phishing'
+          checked={formData.is_phishing}
+          onChange={(e) => setFormData({ ...formData, is_phishing: e.target.checked })}
+          className='w-4 h-4'
+        />
+        <Label htmlFor='is_phishing'>Is this a phishing scenario?</Label>
+      </div>
+
+      <div className='space-y-2'>
+        <Label>Difficulty</Label>
+        <select
+          value={formData.difficulty}
+          onChange={(e) => setFormData({ ...formData, difficulty: e.target.value })}
+          className='w-full px-3 py-2 bg-zinc-900/50 border border-zinc-800 rounded-md'
+          required
+        >
+          <option value='beginner'>Beginner</option>
+          <option value='intermediate'>Intermediate</option>
+          <option value='advanced'>Advanced</option>
+        </select>
+      </div>
+
+      <div className='space-y-2'>
+        <div className='flex justify-between items-center'>
+          <Label>Indicators (Red Flags)</Label>
+          <Button type='button' size='sm' onClick={addIndicator} variant='ghost'>
+            <Plus className='w-4 h-4 mr-1' /> Add Indicator
+          </Button>
+        </div>
+        {formData.indicators.map((indicator, index) => (
+          <div key={index} className='flex gap-2'>
+            <Input
+              placeholder={`Indicator ${index + 1}`}
+              value={indicator}
+              onChange={(e) => handleIndicatorChange(index, e.target.value)}
+              required
+            />
+            {formData.indicators.length > 1 && (
+              <Button type='button' size='sm' variant='ghost' onClick={() => removeIndicator(index)}>
+                <Trash2 className='w-4 h-4' />
+              </Button>
+            )}
+          </div>
+        ))}
+      </div>
+
+      <Button type='submit' className='w-full bg-emerald-600 hover:bg-emerald-700'>
+        {scenarioData ? 'Update Scenario' : 'Create Scenario'}
+      </Button>
+    </form>
+  );
+};
+
+
 export default AdminPanelNew;
