@@ -339,11 +339,11 @@ backend:
   
   - task: "Admin CRUD: Mini Game Scenarios"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
@@ -355,6 +355,35 @@ backend:
           - PUT /api/admin/minigame-scenarios/{scenario_id} - Update scenario
           - DELETE /api/admin/minigame-scenarios/{scenario_id} - Delete scenario
           - All endpoints require admin authentication
+      - working: true
+        agent: "testing"
+        comment: |
+          BACKEND TESTING COMPLETED - ADMIN MINI GAME SCENARIOS CRUD WORKING PERFECTLY
+          
+          ✅ ADMIN MINI GAME SCENARIOS CRUD TESTS:
+          ✅ Get All Scenarios: Successfully retrieved mini game scenarios list (0 initially)
+          ✅ Create Scenario: Successfully created mini game scenario with full data structure
+          ✅ Update Scenario: Successfully updated scenario with additional indicators
+          ✅ Delete Scenario: Successfully deleted mini game scenario
+          
+          COMPREHENSIVE TEST RESULTS:
+          - Get Mini Game Scenarios: ✅ PASS - Retrieved 0 scenarios initially (empty collection)
+          - Create Mini Game Scenario: ✅ PASS - Created scenario with ID and full structure
+          - Update Mini Game Scenario: ✅ PASS - Updated scenario with additional indicators
+          - Delete Mini Game Scenario: ✅ PASS - Deleted scenario successfully
+          
+          CRUD FUNCTIONALITY VERIFIED:
+          - GET /api/admin/minigame-scenarios: Returns array of all mini game scenarios
+          - POST /api/admin/minigame-scenarios: Creates new scenario with auto-generated ID
+          - PUT /api/admin/minigame-scenarios/{id}: Updates existing scenario data
+          - DELETE /api/admin/minigame-scenarios/{id}: Removes scenario from collection
+          - All endpoints require admin authentication (403 without admin token)
+          - Scenario model includes: game_type, title, description, image_url, is_phishing, indicators[], difficulty
+          - Created_by field populated with admin username
+          - Created_at timestamp added automatically
+          - Supports complex data like indicators array for phishing detection training
+          
+          All admin mini game scenarios CRUD functionality is working correctly.
 
   - task: "Course CRUD API endpoints"
     implemented: true
