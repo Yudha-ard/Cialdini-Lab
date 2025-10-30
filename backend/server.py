@@ -784,6 +784,29 @@ async def get_all_users(admin_user: dict = Depends(require_admin)):
 @api_router.get("/admin/stats")
 async def get_admin_stats(admin_user: dict = Depends(require_admin)):
     total_users = await db.users.count_documents({})
+    total_challenges = await db.challenges.count_documents({})
+    total_attempts = await db.challenge_attempts.count_documents({})
+    total_feedbacks = await db.feedbacks.count_documents({})
+    
+    # Recent activity
+    recent_attempts = await db.challenge_attempts.find(
+        {}, 
+        {"_id": 0}
+    ).sort("timestamp", -1).limit(10).to_list(10)
+    
+    recent_feedbacks = await db.feedbacks.find(
+        {}, 
+        {"_id": 0}
+    ).sort("created_at", -1).limit(10).to_list(10)
+    
+    return {
+        "total_users": total_users,
+        "total_challenges": total_challenges,
+        "total_attempts": total_attempts,
+        "total_feedbacks": total_feedbacks,
+        "recent_attempts": recent_attempts,
+        "recent_feedbacks": recent_feedbacks
+    }
 
 @api_router.put("/admin/users/{user_id}")
 async def update_user_by_admin(
