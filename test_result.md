@@ -450,13 +450,107 @@ backend:
           All Course CRUD API endpoints are fully functional and ready for production use.
 
 frontend:
-  - task: "AdminPanel Course Tab dan CRUD UI"
+  - task: "Quiz Mode: Single-play restriction UI"
     implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/QuizMode.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: |
+          Implemented single-play restriction for Quiz Mode:
+          - Added checkCompletionStatus() function to call GET /api/quiz/completion-status on mount
+          - Added alreadyCompleted and previousResult states
+          - Added "Already Completed" screen showing previous results (correct_count, accuracy, points_earned, time_taken)
+          - Updated handleSubmit to catch 400 error and show proper message
+          - Removed "Try Again" button from result screen (replaced with "Go to Dashboard")
+          - Warning message: user can only take quiz once (GLOBAL restriction)
+  
+  - task: "Mini Game: Single-play restriction UI"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/SpotThePhishing.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: |
+          Implemented single-play restriction for Spot the Phishing mini game:
+          - Added AuthContext and API imports, axios
+          - Added checkCompletionStatus() to call GET /api/minigame/completion-status/spot_the_phishing on mount
+          - Added submitGameCompletion() to call POST /api/minigame/complete on game end
+          - Added "completed" game state and "Already Completed" screen
+          - Shows previous results: score, time_taken, emails_answered, lives_remaining
+          - Warning message: user can only play mini game once
+          - endGame() now submits completion data to backend
+  
+  - task: "Challenge Detail: Single-play restriction UI"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/ChallengeDetailNew.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: |
+          Implemented single-play restriction for Challenge Detail:
+          - Added checkCompletionStatus() to call GET /api/challenges/{id}/completion on mount
+          - Updated handleSubmit to catch 400 error and extract previous_result from error response
+          - Added "Already Completed" screen showing previous results (correct_count, total_questions, points_earned, time_taken)
+          - Shows challenge title and previous completion date
+          - Warning message: user can only complete each challenge once
+          - Displays community feedback section even when completed
+  
+  - task: "Admin Panel: Quiz Questions CRUD UI"
+    implemented: false
     working: "NA"
     file: "/app/frontend/src/pages/AdminPanelNew.jsx"
     stuck_count: 0
     priority: "high"
     needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "NOT YET IMPLEMENTED - Need to add Quiz Questions tab with CRUD UI"
+  
+  - task: "Admin Panel: Mini Game Scenarios CRUD UI"
+    implemented: false
+    working: "NA"
+    file: "/app/frontend/src/pages/AdminPanelNew.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "NOT YET IMPLEMENTED - Need to add Mini Game Scenarios tab with CRUD UI"
+  
+  - task: "Admin Panel: Reset Completion UI"
+    implemented: false
+    working: "NA"
+    file: "/app/frontend/src/pages/AdminPanelNew.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "NOT YET IMPLEMENTED - Need to add Reset Completion functionality (possibly in Users tab)"
+
+  - task: "AdminPanel Course Tab dan CRUD UI"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/AdminPanelNew.jsx"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
@@ -494,7 +588,7 @@ frontend:
     working: "NA"
     file: "various"
     stuck_count: 0
-    priority: "medium"
+    priority: "low"
     needs_retesting: false
     status_history:
       - working: "NA"
@@ -506,7 +600,7 @@ frontend:
     working: "NA"
     file: "various"
     stuck_count: 0
-    priority: "medium"
+    priority: "low"
     needs_retesting: false
     status_history:
       - working: "NA"
@@ -518,7 +612,7 @@ frontend:
     working: "NA"
     file: "various"
     stuck_count: 0
-    priority: "medium"
+    priority: "low"
     needs_retesting: false
     status_history:
       - working: "NA"
@@ -530,7 +624,7 @@ frontend:
     working: "NA"
     file: "/app/backend/seed_cialdini_categories.py"
     stuck_count: 0
-    priority: "medium"
+    priority: "low"
     needs_retesting: false
     status_history:
       - working: "NA"
@@ -542,7 +636,7 @@ frontend:
     working: "NA"
     file: "/app/frontend/src/pages/CourseViewer.jsx"
     stuck_count: 0
-    priority: "medium"
+    priority: "low"
     needs_retesting: false
     status_history:
       - working: "NA"
