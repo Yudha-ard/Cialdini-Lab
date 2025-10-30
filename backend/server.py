@@ -1064,25 +1064,45 @@ async def get_certificate(certificate_id: str):
 # ===== QUIZ MODE (RAPID FIRE) =====
 @api_router.get("/quiz/random")
 async def get_random_quiz():
-    # Get 10 random questions from challenges
-    challenges = await db.challenges.find({}, {"_id": 0}).to_list(1000)
-    if not challenges:
-        raise HTTPException(status_code=404, detail="Tidak ada challenges")
+    # Get 10 random questions from quiz_questions collection
+    # If no quiz questions exist, fallback to challenges
+    quiz_questions_list = await db.quiz_questions.find({}, {"_id": 0}).to_list(1000)
     
     import random
-    random.shuffle(challenges)
     
-    quiz_questions = []
-    for challenge in challenges[:10]:
-        if challenge.get('questions'):
-            q = random.choice(challenge['questions'])
+    if quiz_questions_list and len(quiz_questions_list) >= 10:
+        # Use dedicated quiz questions
+        random.shuffle(quiz_questions_list)
+        selected_questions = quiz_questions_list[:10]
+        
+        quiz_questions = []
+        for q in selected_questions:
             quiz_questions.append({
-                "challenge_title": challenge['title'],
+                "challenge_title": q.get('category', 'Quiz'),
                 "question": q['question'],
                 "options": q['options'],
                 "correct_answer": q['correct_answer'],
                 "points": 10
             })
+    else:
+        # Fallback to challenges if no quiz questions
+        challenges = await db.challenges.find({}, {"_id": 0}).to_list(1000)
+        if not challenges:
+            raise HTTPException(status_code=404, detail="Tidak ada quiz questions atau challenges tersedia")
+        
+        random.shuffle(challenges)
+        
+        quiz_questions = []
+        for challenge in challenges[:10]:
+            if challenge.get('questions'):
+                q = random.choice(challenge['questions'])
+                quiz_questions.append({
+                    "challenge_title": challenge['title'],
+                    "question": q['question'],
+                    "options": q['options'],
+                    "correct_answer": q['correct_answer'],
+                    "points": 10
+                })
     
     return {
         "questions": quiz_questions,
