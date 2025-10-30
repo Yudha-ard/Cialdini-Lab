@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { AuthContext, API } from '@/App';
 import Layout from '@/components/Layout';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -6,9 +8,12 @@ import { Badge } from '@/components/ui/badge';
 import { Shield, X, Check, Mail, AlertTriangle, Trophy, Clock, Zap } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { toast } from 'sonner';
+import axios from 'axios';
 
 const SpotThePhishing = () => {
-  const [gameState, setGameState] = useState('menu'); // menu, playing, gameover
+  const navigate = useNavigate();
+  const { token } = React.useContext(AuthContext);
+  const [gameState, setGameState] = useState('menu'); // menu, playing, gameover, completed
   const [currentEmail, setCurrentEmail] = useState(null);
   const [score, setScore] = useState(0);
   const [lives, setLives] = useState(3);
@@ -16,6 +21,8 @@ const SpotThePhishing = () => {
   const [streak, setStreak] = useState(0);
   const [emailsAnswered, setEmailsAnswered] = useState(0);
   const [gameStartTime, setGameStartTime] = useState(null);
+  const [alreadyCompleted, setAlreadyCompleted] = useState(false);
+  const [previousResult, setPreviousResult] = useState(null);
 
   const emails = [
     {
