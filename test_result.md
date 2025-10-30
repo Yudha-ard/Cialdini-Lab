@@ -158,11 +158,11 @@ backend:
   
   - task: "Single-play restriction: Mini Game completion tracking"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
@@ -174,6 +174,30 @@ backend:
           - Prevents replay after completion
           - Awards points based on score
           - Returns completion data when checking status
+      - working: true
+        agent: "testing"
+        comment: |
+          BACKEND TESTING COMPLETED - MINI GAME SINGLE-PLAY RESTRICTION WORKING PERFECTLY
+          
+          ✅ MINI GAME COMPLETION TRACKING TESTS:
+          ✅ Initial Status Check: Mini game correctly shows as not completed for new user
+          ✅ First Completion: Successfully completed spot_the_phishing game (Score: 85, Points: 85)
+          ✅ Completion Status: Mini game marked as completed with proper data storage
+          ✅ Single-Play Restriction: Successfully prevented replay with proper error message
+          
+          COMPREHENSIVE TEST RESULTS:
+          - Mini Game Initial Status: ✅ PASS - Returns completed: false for spot_the_phishing
+          - Mini Game First Completion: ✅ PASS - Awarded 85 points for score of 85
+          - Mini Game Completion Status: ✅ PASS - Marked as completed with score data
+          - Mini Game Replay Prevention: ✅ PASS - Single-play restriction enforced
+          
+          SINGLE-PLAY RESTRICTION VERIFIED:
+          - Each game type can only be completed once per user
+          - Error message: "Mini game ini sudah pernah diselesaikan. Kamu hanya bisa bermain sekali."
+          - Completion data includes score, time_taken_seconds, and custom details
+          - Points are awarded correctly based on game score
+          
+          All mini game completion tracking functionality is working correctly.
   
   - task: "Single-play restriction: Challenge completion tracking"
     implemented: true
