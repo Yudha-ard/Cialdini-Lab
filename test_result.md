@@ -103,8 +103,13 @@
 #====================================================================================================
 
 user_problem_statement: |
-  User meminta fitur Course CRUD untuk Admin dengan kemampuan menambahkan module sesuai course yang ada.
-  Fitur ini harus terintegrasi di AdminPanel dengan tab khusus untuk manajemen Course.
+  User meminta implementasi single-play restriction untuk Quiz, Mini Games, dan Challenges.
+  - Quiz: GLOBAL restriction (setelah menyelesaikan satu quiz, semua quiz terkunci)
+  - Mini Games: Hanya bisa dimainkan sekali per game type
+  - Challenges: Hanya bisa diselesaikan sekali per challenge
+  - User dapat melihat skor/hasil sebelumnya saat mencoba akses konten yang sudah diselesaikan
+  - Admin dapat reset status completion untuk testing
+  - Admin CRUD untuk Quiz Questions dan Mini Game Scenarios
 
 backend:
   - task: "Course CRUD API endpoints"
