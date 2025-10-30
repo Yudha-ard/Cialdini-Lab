@@ -1197,8 +1197,7 @@ class SinglePlayRestrictionTester:
         try:
             fake_challenge_id = "non-existent-challenge-12345"
             response = requests.get(
-                f"{self.base_url}/challenges/{fake_challenge_id}/completion",
-                headers=self.get_user_headers(),
+                f"{self.base_url}/challenges/{fake_challenge_id}",
                 timeout=10
             )
             
