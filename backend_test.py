@@ -1252,56 +1252,7 @@ class SinglePlayRestrictionTester:
         
         return True
 
-    def test_get_all_courses(self):
-        """Test GET /api/courses"""
-        print("\n=== GET ALL COURSES TEST ===")
-        
-        try:
-            response = requests.get(f"{self.base_url}/courses", timeout=10)
-            
-            if response.status_code == 200:
-                courses = response.json()
-                self.log_result(
-                    "Get All Courses", 
-                    True, 
-                    f"Successfully retrieved {len(courses)} courses"
-                )
-                
-                # Validate response structure
-                if isinstance(courses, list):
-                    for course in courses[:3]:  # Check first 3 courses
-                        required_fields = ["id", "title", "description", "category", "difficulty"]
-                        missing_fields = [field for field in required_fields if field not in course]
-                        if missing_fields:
-                            self.log_result(
-                                "Course Structure Validation", 
-                                False, 
-                                f"Missing required fields in course: {missing_fields}"
-                            )
-                            return False
-                    
-                    self.log_result(
-                        "Course Structure Validation", 
-                        True, 
-                        "Course objects have required fields"
-                    )
-                return True
-            else:
-                self.log_result(
-                    "Get All Courses", 
-                    False, 
-                    f"Failed with status {response.status_code}",
-                    response.text
-                )
-                return False
-                
-        except Exception as e:
-            self.log_result(
-                "Get All Courses", 
-                False, 
-                f"Request failed: {str(e)}"
-            )
-            return False
+    # Old course testing methods removed - now focusing on single-play restriction system
     
     def test_create_course(self):
         """Test POST /api/admin/courses"""
