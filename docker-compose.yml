@@ -38,7 +38,7 @@ services:
              python seed_data.py && 
              python seed_indonesia_challenges.py &&
              python seed_massive_challenges.py &&
-             python seed_complete_batch.py &&
+             python seed_final_10.py &&
              python seed_courses.py &&
              uvicorn server:app --host 0.0.0.0 --port 8001 --reload"
 
