@@ -21,13 +21,19 @@ const AdminPanelNew = () => {
   const [courses, setCourses] = useState([]);
   const [education, setEducation] = useState([]);
   const [users, setUsers] = useState([]);
+  const [quizQuestions, setQuizQuestions] = useState([]);
+  const [miniGameScenarios, setMiniGameScenarios] = useState([]);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [showCreateCourseDialog, setShowCreateCourseDialog] = useState(false);
   const [showCreateEducationDialog, setShowCreateEducationDialog] = useState(false);
+  const [showCreateQuizDialog, setShowCreateQuizDialog] = useState(false);
+  const [showCreateMiniGameDialog, setShowCreateMiniGameDialog] = useState(false);
   const [editingChallenge, setEditingChallenge] = useState(null);
   const [editingCourse, setEditingCourse] = useState(null);
   const [editingEducation, setEditingEducation] = useState(null);
   const [editingUser, setEditingUser] = useState(null);
+  const [editingQuiz, setEditingQuiz] = useState(null);
+  const [editingMiniGame, setEditingMiniGame] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -36,12 +42,14 @@ const AdminPanelNew = () => {
 
   const fetchData = async () => {
     try {
-      const [statsRes, challengesRes, coursesRes, educationRes, usersRes] = await Promise.all([
+      const [statsRes, challengesRes, coursesRes, educationRes, usersRes, quizRes, miniGameRes] = await Promise.all([
         axios.get(`${API}/admin/stats`, { headers: { Authorization: `Bearer ${token}` } }),
         axios.get(`${API}/challenges`),
         axios.get(`${API}/courses`),
         axios.get(`${API}/education`),
-        axios.get(`${API}/admin/users`, { headers: { Authorization: `Bearer ${token}` } })
+        axios.get(`${API}/admin/users`, { headers: { Authorization: `Bearer ${token}` } }),
+        axios.get(`${API}/admin/quiz-questions`, { headers: { Authorization: `Bearer ${token}` } }),
+        axios.get(`${API}/admin/minigame-scenarios`, { headers: { Authorization: `Bearer ${token}` } })
       ]);
       setStats(statsRes.data);
       setChallenges(challengesRes.data);
