@@ -216,9 +216,12 @@ const SpotThePhishing = () => {
     }, 800);
   };
 
-  const endGame = () => {
+  const endGame = async () => {
     setGameState('gameover');
     const finalTime = Math.floor((Date.now() - gameStartTime) / 1000);
+    
+    // Submit game completion
+    await submitGameCompletion(score, finalTime);
     
     if (score > 50) {
       confetti({
