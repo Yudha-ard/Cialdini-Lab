@@ -201,11 +201,11 @@ backend:
   
   - task: "Single-play restriction: Challenge completion tracking"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
@@ -216,6 +216,33 @@ backend:
           - Added GET /api/challenges/{challenge_id}/completion endpoint
           - Fixed collection name from db.attempts to db.challenge_attempts
           - Returns previous completion data when user tries to replay
+      - working: true
+        agent: "testing"
+        comment: |
+          BACKEND TESTING COMPLETED - CHALLENGE SINGLE-PLAY RESTRICTION WORKING PERFECTLY
+          
+          ✅ CHALLENGE COMPLETION TRACKING TESTS:
+          ✅ Initial Status Check: Challenge correctly shows as not completed for new user
+          ✅ Challenge Details: Successfully retrieved challenge with 3 questions
+          ✅ First Attempt: Successfully completed challenge (Score: 3/3, Points: 60)
+          ✅ Completion Status: Challenge marked as completed with proper data storage
+          ✅ Single-Play Restriction: Successfully prevented replay and returned previous results
+          
+          COMPREHENSIVE TEST RESULTS:
+          - Challenge Initial Status: ✅ PASS - Returns completed: false for new challenge
+          - Get Challenge Details: ✅ PASS - Retrieved challenge with 3 questions
+          - Challenge First Attempt: ✅ PASS - Perfect score (3/3) with 60 points earned
+          - Challenge Completion Status: ✅ PASS - Marked as completed with points data
+          - Challenge Replay Prevention: ✅ PASS - Returns previous results (60 points)
+          
+          SINGLE-PLAY RESTRICTION VERIFIED:
+          - Each challenge can only be attempted once per user
+          - Replay attempts return 400 error with previous completion results
+          - Previous results include: correct_count, total_questions, points_earned, time_taken
+          - Challenge ID is added to user's completed_challenges array
+          - Collection name correctly uses db.challenge_attempts
+          
+          All challenge completion tracking functionality is working correctly.
   
   - task: "Admin: Reset completion status"
     implemented: true
