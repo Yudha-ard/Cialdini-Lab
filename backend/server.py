@@ -462,6 +462,29 @@ async def attempt_challenge(challenge_id: str, answer: dict, current_user: dict 
     if not challenge:
         raise HTTPException(status_code=404, detail="Challenge tidak ditemukan")
     
+    # Check if challenge already completed (SINGLE-PLAY RESTRICTION)
+    if challenge_id in current_user.get('completed_challenges', []):
+        # Get previous attempt
+        previous_attempt = await db.challenge_attempts.find_one(
+            {"user_id": current_user['id'], "challenge_id": challenge_id, "is_completed": True},
+            {"_id": 0},
+            sort=[("timestamp", -1)]
+        )
+        if previous_attempt:
+            raise HTTPException(
+                status_code=400,
+                detail={
+                    "message": "Challenge ini sudah pernah diselesaikan. Kamu hanya bisa menyelesaikan challenge sekali.",
+                    "previous_result": {
+                        "correct_count": previous_attempt['correct_count'],
+                        "total_questions": previous_attempt['total_questions'],
+                        "points_earned": previous_attempt['points_earned'],
+                        "time_taken_seconds": previous_attempt.get('time_taken_seconds'),
+                        "completed_at": previous_attempt['timestamp']
+                    }
+                }
+            )
+    
     answers = answer.get('answers', [])
     time_taken = answer.get('time_taken_seconds', 0)
     is_daily = answer.get('is_daily_challenge', False)
