@@ -23,6 +23,28 @@ const QuizMode = () => {
   const [started, setStarted] = useState(false);
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [alreadyCompleted, setAlreadyCompleted] = useState(false);
+  const [previousResult, setPreviousResult] = useState(null);
+
+  // Check completion status on mount
+  useEffect(() => {
+    checkCompletionStatus();
+  }, []);
+
+  const checkCompletionStatus = async () => {
+    try {
+      const response = await axios.get(`${API}/quiz/completion-status`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      if (response.data.completed) {
+        setAlreadyCompleted(true);
+        setPreviousResult(response.data.completion_data);
+      }
+    } catch (error) {
+      console.error('Failed to check quiz completion status:', error);
+    }
+  };
 
   useEffect(() => {
     if (started && timeLeft > 0 && !result) {
