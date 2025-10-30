@@ -650,7 +650,13 @@ metadata:
   run_ui: false
 
 test_plan:
-  current_focus: []
+  current_focus:
+    - "Quiz Mode: Single-play restriction UI"
+    - "Mini Game: Single-play restriction UI"
+    - "Challenge Detail: Single-play restriction UI"
+    - "Admin Panel: Quiz Questions CRUD UI"
+    - "Admin Panel: Mini Game Scenarios CRUD UI"
+    - "Admin Panel: Reset Completion UI"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
