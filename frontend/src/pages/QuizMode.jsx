@@ -265,10 +265,10 @@ const QuizMode = () => {
             </div>
             <div className="flex gap-4 justify-center">
               <Button
-                onClick={() => window.location.reload()}
+                onClick={() => navigate('/dashboard')}
                 className="bg-emerald-600 hover:bg-emerald-700"
               >
-                Try Again
+                Go to Dashboard
               </Button>
               <Button
                 onClick={() => navigate('/challenges')}
