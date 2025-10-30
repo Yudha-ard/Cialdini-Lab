@@ -44,9 +44,9 @@ class SinglePlayRestrictionTester:
         if details and not success:
             print(f"   Details: {details}")
     
-    def authenticate(self):
-        """Test authentication and get token"""
-        print("\n=== AUTHENTICATION TEST ===")
+    def authenticate_admin(self):
+        """Test admin authentication and get token"""
+        print("\n=== ADMIN AUTHENTICATION TEST ===")
         
         try:
             response = requests.post(
@@ -60,10 +60,10 @@ class SinglePlayRestrictionTester:
             
             if response.status_code == 200:
                 data = response.json()
-                self.token = data.get("token")
+                self.admin_token = data.get("token")
                 user = data.get("user", {})
                 
-                if self.token and user.get("role") == "admin":
+                if self.admin_token and user.get("role") == "admin":
                     self.log_result(
                         "Admin Authentication", 
                         True, 
@@ -75,14 +75,14 @@ class SinglePlayRestrictionTester:
                         "Admin Authentication", 
                         False, 
                         "Login successful but missing token or admin role",
-                        f"Token: {bool(self.token)}, Role: {user.get('role')}"
+                        f"Token: {bool(self.admin_token)}, Role: {user.get('role')}"
                     )
                     return False
             else:
                 self.log_result(
                     "Admin Authentication", 
                     False, 
-                    f"Login failed with status {response.status_code}",
+                    f"Admin login failed with status {response.status_code}",
                     response.text
                 )
                 return False
@@ -91,14 +91,75 @@ class SinglePlayRestrictionTester:
             self.log_result(
                 "Admin Authentication", 
                 False, 
-                f"Authentication request failed: {str(e)}"
+                f"Admin authentication request failed: {str(e)}"
             )
             return False
     
-    def get_headers(self):
-        """Get headers with authorization"""
+    def create_test_user(self):
+        """Create a test user for testing"""
+        print("\n=== CREATE TEST USER ===")
+        
+        try:
+            response = requests.post(
+                f"{self.base_url}/auth/register",
+                json={
+                    "username": TEST_USER_USERNAME,
+                    "email": TEST_USER_EMAIL,
+                    "password": TEST_USER_PASSWORD,
+                    "full_name": "Test User for Single Play Testing"
+                },
+                timeout=10
+            )
+            
+            if response.status_code == 200:
+                data = response.json()
+                self.user_token = data.get("token")
+                user = data.get("user", {})
+                self.user_id = user.get("id")
+                
+                if self.user_token and self.user_id:
+                    self.log_result(
+                        "Create Test User", 
+                        True, 
+                        f"Successfully created test user: {user.get('username')} (ID: {self.user_id})"
+                    )
+                    return True
+                else:
+                    self.log_result(
+                        "Create Test User", 
+                        False, 
+                        "User created but missing token or user ID",
+                        f"Token: {bool(self.user_token)}, User ID: {self.user_id}"
+                    )
+                    return False
+            else:
+                self.log_result(
+                    "Create Test User", 
+                    False, 
+                    f"User creation failed with status {response.status_code}",
+                    response.text
+                )
+                return False
+                
+        except Exception as e:
+            self.log_result(
+                "Create Test User", 
+                False, 
+                f"User creation request failed: {str(e)}"
+            )
+            return False
+    
+    def get_admin_headers(self):
+        """Get headers with admin authorization"""
         return {
-            "Authorization": f"Bearer {self.token}",
+            "Authorization": f"Bearer {self.admin_token}",
+            "Content-Type": "application/json"
+        }
+    
+    def get_user_headers(self):
+        """Get headers with user authorization"""
+        return {
+            "Authorization": f"Bearer {self.user_token}",
             "Content-Type": "application/json"
         }
     
