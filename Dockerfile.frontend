@@ -1,0 +1,17 @@
+# Frontend Dockerfile
+FROM node:18-alpine
+
+WORKDIR /app/frontend
+
+# Install dependencies
+COPY frontend/package.json frontend/yarn.lock ./
+RUN yarn install --frozen-lockfile
+
+# Copy frontend code
+COPY frontend/ .
+
+# Expose port
+EXPOSE 3000
+
+# Start dev server
+CMD ["yarn", "start"]
