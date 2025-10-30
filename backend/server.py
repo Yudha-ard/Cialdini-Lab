@@ -1257,6 +1257,16 @@ async def complete_minigame(data: dict, current_user: dict = Depends(get_current
         "message": "Mini game berhasil diselesaikan!"
     }
 
+@api_router.get("/minigame/scenarios/{game_type}")
+async def get_minigame_scenarios(game_type: str):
+    """Get all scenarios for a specific mini game type"""
+    scenarios = await db.minigame_scenarios.find(
+        {"game_type": game_type},
+        {"_id": 0}
+    ).to_list(1000)
+    
+    return scenarios
+
 # ===== CHALLENGE COMPLETION STATUS =====
 @api_router.get("/challenges/{challenge_id}/completion")
 async def get_challenge_completion_status(challenge_id: str, current_user: dict = Depends(get_current_user)):
