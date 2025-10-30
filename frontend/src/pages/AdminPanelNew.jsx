@@ -1638,7 +1638,20 @@ const ChallengeForm = ({ token, challenge, onSuccess }) => {
 
         {formData.questions.map((q, idx) => (
           <Card key={idx} className='bg-zinc-900/30 border-zinc-800 p-4 space-y-3'>
-            <Label>Question {idx + 1}</Label>
+            <div className='flex justify-between items-center'>
+              <Label>Question {idx + 1}</Label>
+              {formData.questions.length > 1 && (
+                <Button 
+                  type='button' 
+                  onClick={() => removeQuestion(idx)} 
+                  variant='ghost' 
+                  size='sm'
+                  className='text-red-400 hover:text-red-300'
+                >
+                  <Trash2 className='w-4 h-4' />
+                </Button>
+              )}
+            </div>
             <Textarea
               value={q.question}
               onChange={(e) => updateQuestion(idx, 'question', e.target.value)}
