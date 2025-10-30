@@ -239,6 +239,87 @@ const SpotThePhishing = () => {
     return { text: 'Keep Learning!', color: 'text-gray-400', icon: <AlertTriangle className="w-6 h-6" /> };
   };
 
+  // Show "Already Completed" screen
+  if (gameState === 'completed' && alreadyCompleted && previousResult) {
+    const rating = score >= 100 ? { text: 'Security Expert!', color: 'text-yellow-400' } :
+                   previousResult.score >= 70 ? { text: 'Phishing Hunter!', color: 'text-emerald-400' } :
+                   previousResult.score >= 40 ? { text: 'Good Awareness!', color: 'text-blue-400' } :
+                   { text: 'Keep Learning!', color: 'text-gray-400' };
+    
+    return (
+      <Layout>
+        <div className="max-w-4xl mx-auto py-12 space-y-8">
+          <Card className="glass border-yellow-600/30 p-12 text-center">
+            <div className="w-24 h-24 rounded-full bg-yellow-500/10 flex items-center justify-center mx-auto mb-6">
+              <Trophy className="w-12 h-12 text-yellow-400" />
+            </div>
+            <h1 className="text-4xl font-bold mb-4">🏆 Game Sudah Diselesaikan!</h1>
+            <p className="text-gray-400 text-lg mb-8">
+              Kamu sudah menyelesaikan mini game ini sebelumnya.\nBerikut adalah hasil terbaik kamu:
+            </p>
+            
+            <div className="grid md:grid-cols-2 gap-4 mb-8">
+              <div className="bg-zinc-900/50 rounded-lg p-6">
+                <div className="text-4xl font-bold text-emerald-400 mb-2">
+                  {previousResult.score}
+                </div>
+                <div className="text-gray-400">Total Score</div>
+              </div>
+              <div className="bg-zinc-900/50 rounded-lg p-6">
+                <div className="text-4xl font-bold text-yellow-400 mb-2">
+                  {previousResult.time_taken_seconds}s
+                </div>
+                <div className="text-gray-400">Time Taken</div>
+              </div>
+            </div>
+
+            <div className="mb-6 p-4 bg-zinc-900/50 rounded-lg">
+              <p className={`text-2xl font-bold mb-2 ${rating.color}`}>
+                {rating.text}
+              </p>
+              {previousResult.details && (
+                <div className="text-sm text-gray-400 space-y-1">
+                  <p>Email Dijawab: {previousResult.details.emails_answered || 'N/A'}</p>
+                  <p>Nyawa Tersisa: {previousResult.details.lives_remaining || 0}</p>
+                </div>
+              )}
+              <p className="text-xs text-gray-500 mt-3">
+                Diselesaikan: {new Date(previousResult.completed_at).toLocaleDateString('id-ID', {
+                  day: 'numeric',
+                  month: 'long',
+                  year: 'numeric',
+                  hour: '2-digit',
+                  minute: '2-digit'
+                })}
+              </p>
+            </div>
+
+            <div className="p-4 bg-yellow-900/20 border border-yellow-600/30 rounded-lg mb-6">
+              <p className="text-yellow-400 text-sm">
+                ⚠️ Kamu hanya bisa bermain mini game ini sekali. Hasil di atas adalah skor final kamu.
+              </p>
+            </div>
+
+            <div className="flex gap-4 justify-center">
+              <Button
+                onClick={() => navigate('/dashboard')}
+                className="bg-emerald-600 hover:bg-emerald-700"
+              >
+                Go to Dashboard
+              </Button>
+              <Button
+                onClick={() => navigate('/challenges')}
+                variant="outline"
+              >
+                Back to Challenges
+              </Button>
+            </div>
+          </Card>
+        </div>
+      </Layout>
+    );
+  }
+
   if (gameState === 'menu') {
     return (
       <Layout>
