@@ -552,7 +552,7 @@ async def attempt_challenge(challenge_id: str, answer: dict, current_user: dict 
     )
     attempt_dict = attempt.model_dump()
     attempt_dict['timestamp'] = attempt_dict['timestamp'].isoformat()
-    await db.attempts.insert_one(attempt_dict)
+    await db.challenge_attempts.insert_one(attempt_dict)
     
     # Update user progress if completed and not already completed
     if is_completed and challenge_id not in current_user.get('completed_challenges', []):
