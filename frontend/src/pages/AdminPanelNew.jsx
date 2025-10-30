@@ -1014,6 +1014,8 @@ const CourseForm = ({ token, courseData, onSuccess }) => {
     category: 'social_engineering',
     difficulty: 'beginner',
     modules: [],
+    quiz_questions: [],
+    passing_score: 70,
     total_duration_minutes: 0,
     prerequisites: [],
     learning_outcomes: [],
