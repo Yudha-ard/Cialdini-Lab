@@ -1757,20 +1757,24 @@ class SinglePlayRestrictionTester:
             return False
     
     def run_all_tests(self):
-        """Run all course CRUD tests"""
-        print("🚀 Starting Course CRUD API Testing...")
+        """Run all single-play restriction tests"""
+        print("🚀 Starting Single-Play Restriction System Testing...")
         print(f"Backend URL: {self.base_url}")
         print(f"Admin Credentials: {ADMIN_USERNAME}")
+        print(f"Test User: {TEST_USER_USERNAME}")
         
         # Test sequence
         tests = [
-            self.authenticate,
-            self.test_get_all_courses,
-            self.test_create_course,
-            self.test_get_single_course,
-            self.test_update_course,
-            self.test_edge_cases,
-            self.test_delete_course
+            self.authenticate_admin,
+            self.create_test_user,
+            self.get_challenge_id,
+            self.test_quiz_completion_tracking,
+            self.test_minigame_completion_tracking,
+            self.test_challenge_completion_tracking,
+            self.test_admin_reset_functionality,
+            self.test_admin_quiz_questions_crud,
+            self.test_admin_minigame_scenarios_crud,
+            self.test_edge_cases
         ]
         
         passed = 0
@@ -1786,9 +1790,9 @@ class SinglePlayRestrictionTester:
                 total += 1
         
         # Summary
-        print(f"\n{'='*60}")
-        print(f"📊 COURSE CRUD API TEST SUMMARY")
-        print(f"{'='*60}")
+        print(f"\n{'='*80}")
+        print(f"📊 SINGLE-PLAY RESTRICTION SYSTEM TEST SUMMARY")
+        print(f"{'='*80}")
         print(f"Total Tests: {total}")
         print(f"Passed: {passed}")
         print(f"Failed: {total - passed}")
@@ -1800,15 +1804,34 @@ class SinglePlayRestrictionTester:
             status = "✅" if result["success"] else "❌"
             print(f"{status} {result['test']}: {result['message']}")
         
+        # Test categories summary
+        print(f"\n🎯 TEST CATEGORIES SUMMARY:")
+        categories = {
+            "Authentication": ["Admin Authentication", "Create Test User"],
+            "Quiz System": ["Quiz Initial Status", "Get Quiz Questions", "Quiz First Submission", "Quiz Completion Status", "Quiz Replay Prevention", "Quiz Reset Verification"],
+            "Mini Game System": ["Mini Game Initial Status", "Mini Game First Completion", "Mini Game Completion Status", "Mini Game Replay Prevention"],
+            "Challenge System": ["Challenge Initial Status", "Get Challenge Details", "Challenge First Attempt", "Challenge Completion Status", "Challenge Replay Prevention"],
+            "Admin Reset": ["Admin Reset Quiz", "Admin Reset Mini Game", "Admin Reset Challenge"],
+            "Admin CRUD": ["Get Quiz Questions", "Create Quiz Question", "Update Quiz Question", "Delete Quiz Question", "Get Mini Game Scenarios", "Create Mini Game Scenario", "Update Mini Game Scenario", "Delete Mini Game Scenario"],
+            "Security": ["Unauthorized Admin Access", "Non-existent Challenge", "Invalid Reset Type"]
+        }
+        
+        for category, test_names in categories.items():
+            category_results = [r for r in self.test_results if r["test"] in test_names]
+            if category_results:
+                passed_in_category = sum(1 for r in category_results if r["success"])
+                total_in_category = len(category_results)
+                print(f"  {category}: {passed_in_category}/{total_in_category} ({'✅' if passed_in_category == total_in_category else '❌'})")
+        
         return passed == total
 
 if __name__ == "__main__":
-    tester = CourseAPITester()
+    tester = SinglePlayRestrictionTester()
     success = tester.run_all_tests()
     
     if success:
-        print(f"\n🎉 All Course CRUD API tests passed!")
+        print(f"\n🎉 All Single-Play Restriction System tests passed!")
         sys.exit(0)
     else:
-        print(f"\n⚠️  Some Course CRUD API tests failed!")
+        print(f"\n⚠️  Some Single-Play Restriction System tests failed!")
         sys.exit(1)
