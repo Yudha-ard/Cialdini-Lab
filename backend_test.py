@@ -18,12 +18,16 @@ TEST_USER_USERNAME = f"testuser_{str(uuid.uuid4())[:8]}"
 TEST_USER_EMAIL = f"test_{str(uuid.uuid4())[:8]}@example.com"
 TEST_USER_PASSWORD = "testpass123"
 
-class CourseAPITester:
+class SinglePlayRestrictionTester:
     def __init__(self):
         self.base_url = BASE_URL
-        self.token = None
-        self.created_course_id = None
+        self.admin_token = None
+        self.user_token = None
+        self.user_id = None
         self.test_results = []
+        self.created_quiz_question_id = None
+        self.created_minigame_scenario_id = None
+        self.challenge_id = None
         
     def log_result(self, test_name, success, message, details=None):
         """Log test result"""
