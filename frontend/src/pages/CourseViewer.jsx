@@ -15,22 +15,41 @@ const CourseViewer = () => {
   const navigate = useNavigate();
   const { token } = React.useContext(AuthContext);
   const [course, setCourse] = useState(null);
+  const [progress, setProgress] = useState(null);
   const [currentModuleIndex, setCurrentModuleIndex] = useState(0);
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
+  const [showQuiz, setShowQuiz] = useState(false);
+  const [quizAnswers, setQuizAnswers] = useState([]);
+  const [quizResult, setQuizResult] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchCourse();
+    fetchProgress();
   }, [id]);
 
   const fetchCourse = async () => {
     try {
       const response = await axios.get(`${API}/courses/${id}`);
       setCourse(response.data);
+      if (response.data.quiz_questions) {
+        setQuizAnswers(new Array(response.data.quiz_questions.length).fill(null));
+      }
     } catch (error) {
       toast.error('Gagal load course');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchProgress = async () => {
+    try {
+      const response = await axios.get(`${API}/courses/${id}/progress`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setProgress(response.data);
+    } catch (error) {
+      console.error('Failed to fetch progress:', error);
     }
   };
 
