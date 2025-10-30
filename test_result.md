@@ -246,11 +246,11 @@ backend:
   
   - task: "Admin: Reset completion status"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
@@ -262,6 +262,33 @@ backend:
           - Removes from completion collections
           - Updates user's completed_challenges array for challenges
           - Requires admin authentication
+      - working: true
+        agent: "testing"
+        comment: |
+          BACKEND TESTING COMPLETED - ADMIN RESET FUNCTIONALITY WORKING PERFECTLY
+          
+          ✅ ADMIN RESET COMPLETION TESTS:
+          ✅ Quiz Reset: Successfully reset quiz completion (Deleted 1 record)
+          ✅ Quiz Reset Verification: User can take quiz again after reset
+          ✅ Mini Game Reset: Successfully reset mini game completion (Deleted 1 record)
+          ✅ Challenge Reset: Successfully reset challenge completion (Deleted 1 record)
+          
+          COMPREHENSIVE TEST RESULTS:
+          - Admin Reset Quiz: ✅ PASS - Deleted 1 quiz completion record
+          - Quiz Reset Verification: ✅ PASS - Quiz status shows completed: false after reset
+          - Admin Reset Mini Game: ✅ PASS - Deleted 1 mini game completion record
+          - Admin Reset Challenge: ✅ PASS - Deleted 1 challenge completion record
+          
+          RESET FUNCTIONALITY VERIFIED:
+          - POST /api/admin/reset-completion endpoint working correctly
+          - Supports type: "quiz", "minigame", "challenge"
+          - Optional specific_id parameter for targeted resets
+          - Properly removes records from respective completion collections
+          - Updates user's completed_challenges array for challenge resets
+          - Requires admin authentication (403 without admin token)
+          - Returns deleted_count in response for verification
+          
+          All admin reset functionality is working correctly.
   
   - task: "Admin CRUD: Quiz Questions"
     implemented: true
