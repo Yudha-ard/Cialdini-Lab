@@ -203,9 +203,11 @@ const AdminPanelNew = () => {
 
         {/* Tabs */}
         <Tabs defaultValue='challenges' className='w-full'>
-          <TabsList className='grid w-full grid-cols-5 bg-zinc-900/50'>
+          <TabsList className='grid w-full grid-cols-7 bg-zinc-900/50'>
             <TabsTrigger value='challenges'>Challenges</TabsTrigger>
             <TabsTrigger value='courses'>Courses</TabsTrigger>
+            <TabsTrigger value='quiz'>Quiz</TabsTrigger>
+            <TabsTrigger value='minigame'>Mini Game</TabsTrigger>
             <TabsTrigger value='education'>Edukasi</TabsTrigger>
             <TabsTrigger value='users'>Users</TabsTrigger>
             <TabsTrigger value='activity'>Activity</TabsTrigger>
