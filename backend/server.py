@@ -845,24 +845,6 @@ async def delete_user_by_admin(user_id: str, admin_user: dict = Depends(require_
     
     return {"message": "User deleted successfully"}
 
-
-    total_challenges = await db.challenges.count_documents({})
-    total_attempts = await db.attempts.count_documents({})
-    total_feedbacks = await db.feedbacks.count_documents({})
-    
-    # Recent activity
-    recent_attempts = await db.attempts.find({}, {"_id": 0}).sort("timestamp", -1).limit(10).to_list(10)
-    recent_feedbacks = await db.feedbacks.find({}, {"_id": 0}).sort("created_at", -1).limit(10).to_list(10)
-    
-    return {
-        "total_users": total_users,
-        "total_challenges": total_challenges,
-        "total_attempts": total_attempts,
-        "total_feedbacks": total_feedbacks,
-        "recent_attempts": recent_attempts,
-        "recent_feedbacks": recent_feedbacks
-    }
-
 # ===== HINTS SYSTEM =====
 @api_router.post("/challenges/{challenge_id}/hint")
 async def get_hint(challenge_id: str, hint_data: dict, current_user: dict = Depends(get_current_user)):
