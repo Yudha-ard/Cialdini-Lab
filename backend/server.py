@@ -155,6 +155,12 @@ class CourseModule(BaseModel):
     description: str
     slides: List[CourseSlide]
 
+class CourseQuizQuestion(BaseModel):
+    question: str
+    options: List[str]
+    correct_answer: int
+    explanation: str
+
 class Course(BaseModel):
     model_config = ConfigDict(extra="ignore")
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
@@ -163,6 +169,8 @@ class Course(BaseModel):
     category: str
     difficulty: str
     modules: List[CourseModule]
+    quiz_questions: List[CourseQuizQuestion] = []
+    passing_score: int = 70  # Percentage to pass
     total_duration_minutes: int
     prerequisites: List[str] = []
     learning_outcomes: List[str] = []
@@ -176,6 +184,9 @@ class CourseProgress(BaseModel):
     course_id: str
     completed_modules: List[int] = []
     current_slide: int = 0
+    quiz_completed: bool = False
+    quiz_score: Optional[int] = None
+    quiz_passed: bool = False
     completed: bool = False
     started_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     completed_at: Optional[datetime] = None
