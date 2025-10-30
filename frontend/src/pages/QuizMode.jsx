@@ -113,7 +113,12 @@ const QuizMode = () => {
 
       toast.success(`Quiz complete! +${response.data.points_earned} poin`);
     } catch (error) {
-      toast.error('Gagal submit quiz');
+      if (error.response?.status === 400) {
+        toast.error('Quiz sudah pernah diselesaikan sebelumnya!');
+        await checkCompletionStatus();
+      } else {
+        toast.error('Gagal submit quiz');
+      }
     } finally {
       setLoading(false);
     }
