@@ -2,123 +2,95 @@
 
 set -e  # Exit on error
 
-echo "🚀 Tegalsec Social Engineering Lab - Docker Installation"
-echo "========================================================"
-echo ""
-
-# Colors for output
+# Warna untuk output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
-# Check if Docker is installed
+echo -e "${GREEN}🚀 Tegalsec Social Engineering Lab - Quick Install${NC}"
+echo "========================================================"
+echo ""
+
+# 1. Check Docker Installation
 if ! command -v docker &> /dev/null; then
-    echo -e "${RED}❌ Docker is not installed. Please install Docker first.${NC}"
-    echo "Visit: https://docs.docker.com/get-docker/"
+    echo -e "${RED}❌ Docker is not installed.${NC}"
     exit 1
 fi
 
-# Check if Docker Compose is installed
-if ! command -v docker-compose &> /dev/null; then
-    echo -e "${RED}❌ Docker Compose is not installed. Please install Docker Compose first.${NC}"
-    echo "Visit: https://docs.docker.com/compose/install/"
+# 2. Check Docker Compose V2
+if ! docker compose version &> /dev/null; then
+    echo -e "${RED}❌ Docker Compose V2 is not detected.${NC}"
     exit 1
 fi
 
-echo -e "${GREEN}✅ Docker and Docker Compose are installed${NC}"
-
-# Check Docker daemon
+# 3. Check Docker Daemon
 if ! docker info > /dev/null 2>&1; then
-    echo -e "${RED}❌ Docker daemon is not running. Please start Docker first.${NC}"
+    echo -e "${RED}❌ Docker daemon is not running.${NC}"
     exit 1
 fi
 
-echo -e "${GREEN}✅ Docker daemon is running${NC}"
-echo ""
+# 4. Clean up old containers
+echo -e "${YELLOW}🧹 Cleaning up...${NC}"
+docker compose down -v 2>/dev/null || true
 
-# Stop and remove existing containers
-echo -e "${YELLOW}🧹 Cleaning up existing containers...${NC}"
-docker-compose down -v 2>/dev/null || true
-echo ""
-
-# Build and start services
-echo -e "${YELLOW}🏗️  Building Docker images...${NC}"
-echo "This may take 5-10 minutes on first run..."
-echo ""
-
-if docker-compose build --no-cache; then
+# 5. Build images
+echo -e "${YELLOW}🏗️  Building images...${NC}"
+if docker compose build --no-cache; then
     echo -e "${GREEN}✅ Build successful!${NC}"
 else
-    echo -e "${RED}❌ Build failed! Check logs above.${NC}"
+    echo -e "${RED}❌ Build failed!${NC}"
     exit 1
 fi
 
-echo ""
+# 6. Start services
 echo -e "${YELLOW}🚀 Starting services...${NC}"
-if docker-compose up -d; then
-    echo -e "${GREEN}✅ Services started!${NC}"
+if docker compose up -d; then
+    echo -e "${GREEN}✅ Services started in background!${NC}"
 else
     echo -e "${RED}❌ Failed to start services!${NC}"
     exit 1
 fi
 
-# Wait for services with progress indicator
+# 7. Check Ports & IP (NEW FEATURE)
 echo ""
-echo -e "${YELLOW}⏳ Waiting for services to initialize...${NC}"
-for i in {1..30}; do
-    echo -n "."
-    sleep 1
-    
-    # Check if backend is healthy
-    if curl -s http://localhost:8001/docs > /dev/null 2>&1; then
-        echo ""
-        echo -e "${GREEN}✅ Backend is ready!${NC}"
-        break
-    fi
-    
-    if [ $i -eq 30 ]; then
-        echo ""
-        echo -e "${YELLOW}⚠️  Services might still be starting. Check logs with: docker-compose logs -f${NC}"
-    fi
-done
+echo -e "${YELLOW}🔍 Checking Network & Ports...${NC}"
 
-# Check service status
-echo ""
-echo -e "${YELLOW}🔍 Checking service status...${NC}"
-docker-compose ps
+# Detect Local IP (Linux support mostly)
+HOST_IP=$(hostname -I 2>/dev/null | awk '{print $1}')
+if [ -z "$HOST_IP" ]; then
+    HOST_IP="127.0.0.1"
+fi
+echo -e "   Detected Host IP: ${GREEN}$HOST_IP${NC}"
 
-# Show recent logs
-echo ""
-echo -e "${YELLOW}📋 Recent logs:${NC}"
-echo ""
-docker-compose logs --tail=30 | tail -20
+# Function to check port using bash tcp (no extra tools needed)
+check_port() {
+    local port=$1
+    local name=$2
+    # Mencoba koneksi TCP ke localhost pada port tertentu
+    if (echo > /dev/tcp/127.0.0.1/$port) >/dev/null 2>&1; then
+        echo -e "   $name ($port): ${GREEN}OPEN (Running)${NC}"
+    else
+        echo -e "   $name ($port): ${RED}CLOSED (Not accessible yet)${NC}"
+    fi
+}
+
+check_port 3000 "Frontend"
+check_port 8001 "Backend"
 
 echo ""
 echo "=========================================="
 echo -e "${GREEN}✅ Installation Complete!${NC}"
 echo "=========================================="
 echo ""
-echo "🌐 Access the application:"
+echo "🌐 Access URLs:"
 echo "   Frontend: http://localhost:3000"
-echo "   Backend API: http://localhost:8001"
-echo "   API Docs: http://localhost:8001/docs"
+echo "           : http://$HOST_IP:3000"
+echo "   Backend:  http://localhost:8001"
 echo ""
-echo "👤 Default Admin Account:"
+echo "👤 Credentials (Admin):"
 echo "   Username: admin"
 echo "   Password: admin123"
 echo ""
-echo "📝 Useful Commands:"
-echo "   View logs: docker-compose logs -f"
-echo "   Stop: docker-compose down"
-echo "   Restart: docker-compose restart"
-echo "   Fresh start: ./install.sh"
+echo -e "${YELLOW}Note: Jika status port masih CLOSED, tunggu 1-2 menit agar database selesai seeding.${NC}"
 echo ""
-echo "📖 Troubleshooting Guide: See DOCKER_GUIDE.md"
-echo ""
-echo -e "${YELLOW}⚠️  If services are not responding:${NC}"
-echo "   1. Wait 1-2 more minutes for initialization"
-echo "   2. Check logs: docker-compose logs -f"
-echo "   3. Restart: docker-compose restart"
-echo ""
-
