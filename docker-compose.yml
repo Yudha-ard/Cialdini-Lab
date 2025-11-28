@@ -16,20 +16,22 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 10s
 
   backend:
     build:
-      context: .
-      dockerfile: Dockerfile.backend
+      context: ./backend
+      dockerfile: Dockerfile
     container_name: tegalsec-backend
     restart: unless-stopped
     ports:
       - "8001:8001"
     environment:
-      - MONGO_URL=mongodb://mongodb:27017
+      - MONGO_URL=mongodb://tegalsec-mongodb:27017
       - DB_NAME=tegalsec_lab
-      - JWT_SECRET_KEY=your-super-secret-jwt-key-change-this-in-production-${RANDOM_KEY:-default}
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY:-default_insecure_secret_for_dev}
       - ALGORITHM=HS256
+      - PYTHONUNBUFFERED=1
     depends_on:
       mongodb:
         condition: service_healthy
@@ -40,11 +42,11 @@ services:
       echo 'Waiting for MongoDB...' &&
       sleep 5 &&
       echo 'Seeding database...' &&
-      python seed_data.py &&
-      python seed_indonesia_challenges.py &&
-      python seed_massive_challenges.py &&
-      python seed_final_10.py &&
-      python seed_courses.py &&
+      python seed_data.py || echo 'seed_data failed or skipped' &&
+      python seed_indonesia_challenges.py || echo 'seed_indonesia failed or skipped' &&
+      python seed_massive_challenges.py || echo 'seed_massive failed or skipped' &&
+      python seed_final_10.py || echo 'seed_final failed or skipped' &&
+      python seed_courses.py || echo 'seed_courses failed or skipped' &&
       echo 'Database seeded successfully!' &&
       echo 'Starting backend server...' &&
       uvicorn server:app --host 0.0.0.0 --port 8001 --reload
@@ -52,8 +54,8 @@ services:
 
   frontend:
     build:
-      context: .
-      dockerfile: Dockerfile.frontend
+      context: ./frontend
+      dockerfile: Dockerfile
     container_name: tegalsec-frontend
     restart: unless-stopped
     ports:
@@ -64,7 +66,8 @@ services:
       - CHOKIDAR_USEPOLLING=true
       - WATCHPACK_POLLING=true
     depends_on:
-      - backend
+      backend:
+        condition: service_started
     networks:
       - tegalsec-network
     stdin_open: true
@@ -76,4 +79,4 @@ volumes:
 
 networks:
   tegalsec-network:
-    driver: bridge
+      driver: bridge
